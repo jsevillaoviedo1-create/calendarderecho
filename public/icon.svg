@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <linearGradient id="gridGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.7" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#4f46e5" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="128" fill="#020617" />
+  
+  <!-- App Icon Badge -->
+  <rect x="56" y="56" width="400" height="400" rx="96" fill="url(#bgGrad)" filter="url(#shadow)" />
+
+  <!-- Calendar Top Header -->
+  <path d="M 56 152 Q 56 152 456 152 L 456 112 Q 456 56 400 56 L 112 56 Q 56 56 56 112 Z" fill="#4338ca" />
+
+  <!-- Binder Rings -->
+  <rect x="144" y="32" width="28" height="56" rx="14" fill="#ffffff" />
+  <rect x="340" y="32" width="28" height="56" rx="14" fill="#ffffff" />
+
+  <!-- Calendar Grid Marks -->
+  <circle cx="160" cy="224" r="22" fill="url(#gridGrad)" />
+  <circle cx="256" cy="224" r="22" fill="url(#gridGrad)" />
+  <circle cx="352" cy="224" r="22" fill="url(#gridGrad)" />
+
+  <circle cx="160" cy="304" r="22" fill="url(#gridGrad)" />
+  <circle cx="256" cy="304" r="22" fill="#38bdf8" />
+  <circle cx="352" cy="304" r="22" fill="url(#gridGrad)" />
+
+  <circle cx="160" cy="384" r="22" fill="url(#gridGrad)" />
+  <circle cx="256" cy="384" r="22" fill="url(#gridGrad)" />
+  <circle cx="352" cy="384" r="22" fill="url(#gridGrad)" />
+
+  <!-- Active Checkmark Sparkle -->
+  <path d="M 244 304 L 252 312 L 268 296" fill="none" stroke="#020617" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

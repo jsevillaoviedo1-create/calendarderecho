@@ -67,7 +67,7 @@ export async function registerBiometricCredential(
     const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
       challenge,
       rp: {
-        name: 'Chronos Calendar',
+        name: 'Calendario Derecho Pro',
         id: window.location.hostname,
       },
       user: {

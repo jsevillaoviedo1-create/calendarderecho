@@ -42,7 +42,11 @@ export function AuthModal({ isOpen }: AuthModalProps) {
     } catch (err: any) {
       console.error('Auth error:', err);
       let msg = err.message || 'Error en la autenticación.';
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+      if (err.code === 'auth/operation-not-allowed') {
+        msg = '⚠️ El método de Correo/Contraseña está desactivado en tu proyecto de Firebase. Debes activarlo en Firebase Console → Authentication → Sign-in method → Correo electrónico/contraseña.';
+      } else if (err.code === 'auth/unauthorized-domain') {
+        msg = `⚠️ El dominio actual (${typeof window !== 'undefined' ? window.location.hostname : 'Netlify'}) no está autorizado en Firebase. Añádelo en Firebase Console → Authentication → Settings → Authorized domains.`;
+      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
         msg = 'Credenciales inválidas. Comprueba tu correo y contraseña.';
       } else if (err.code === 'auth/email-already-in-use') {
         msg = 'Ya existe una cuenta registrada con este correo.';
@@ -64,7 +68,12 @@ export function AuthModal({ isOpen }: AuthModalProps) {
     try {
       await loginWithGoogle();
     } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') {
+      console.error('Google Auth error:', err);
+      if (err.code === 'auth/unauthorized-domain') {
+        setError(
+          `⚠️ Dominio no autorizado: Debes añadir "${typeof window !== 'undefined' ? window.location.hostname : 'tu-sitio.netlify.app'}" en Firebase Console → Authentication → Settings → Authorized domains.`
+        );
+      } else if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message || 'Error iniciando sesión con Google.');
       }
     } finally {
@@ -84,13 +93,13 @@ export function AuthModal({ isOpen }: AuthModalProps) {
             {isReset
               ? 'Recuperar Contraseña'
               : isRegister
-              ? 'Crear Cuenta en Chronos'
+              ? 'Crear Cuenta en Calendario Derecho Pro'
               : 'Iniciar Sesión'}
           </h2>
           <p className="text-sm text-slate-400 mt-1 max-w-xs">
             {isReset
               ? 'Te enviaremos las instrucciones de restablecimiento a tu correo.'
-              : 'Accede a tu calendario privado protegido con Firestore y WebAuthn.'}
+              : 'accede a tu calendario completamente privado'}
           </p>
         </div>
 
@@ -274,7 +283,7 @@ export function AuthModal({ isOpen }: AuthModalProps) {
         {/* Security badge footer */}
         <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-center gap-2 text-slate-500 text-[11px]">
           <Shield className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Aislamiento estricto de datos con Cloud Firestore & WebAuthn</span>
+          <span>informacion guardada en local no se sube informacion a la nube</span>
         </div>
       </div>
     </div>

@@ -83,7 +83,7 @@ export function ICSImportModal({ isOpen, onClose }: ICSImportModalProps) {
       setImportedCount(count);
       await notifyEventChange(
         '📥 Eventos ICS Importados',
-        `Se han importado exitosamente ${count} eventos a tu calendario de Chronos.`,
+        `Se han importado exitosamente ${count} eventos a tu Calendario Derecho Pro.`,
         undefined,
         'ics_imported'
       );
@@ -150,8 +150,8 @@ END:VCALENDAR`;
       setError('No tienes eventos en tu calendario para exportar.');
       return;
     }
-    const icsContent = exportToICS(events, 'Mi Calendario Chronos');
-    downloadICS(icsContent, `chronos_export_${new Date().toISOString().split('T')[0]}.ics`);
+    const icsContent = exportToICS(events, 'Calendario Derecho Pro');
+    downloadICS(icsContent, `calendario_derecho_export_${new Date().toISOString().split('T')[0]}.ics`);
   };
 
   return (

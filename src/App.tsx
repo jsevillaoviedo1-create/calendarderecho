@@ -14,6 +14,7 @@ import { ICSImportModal } from './components/ICSImportModal';
 import { BiometricLockModal } from './components/BiometricLockModal';
 import { BiometricSettingsModal } from './components/BiometricSettingsModal';
 import { AuthModal } from './components/AuthModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { CalendarEventItem } from './types/calendar';
 import {
   Shield,
@@ -62,8 +63,8 @@ function CalendarApp() {
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 mb-4 animate-bounce">
           <CalendarIcon className="w-6 h-6 text-white" />
         </div>
-        <p className="text-sm font-medium text-slate-300">Cargando Chronos Calendar...</p>
-        <p className="text-xs text-slate-500 mt-1">Conectando con Cloud Firestore...</p>
+        <p className="text-sm font-medium text-slate-300">Cargando Calendario Derecho Pro...</p>
+        <p className="text-xs text-slate-500 mt-1">Cargando tu calendario privado...</p>
       </div>
     );
   }
@@ -72,6 +73,9 @@ function CalendarApp() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {/* Biometric lock screen overlay when session is locked */}
       <BiometricLockModal />
+
+      {/* Offline Status Indicator */}
+      <OfflineIndicator />
 
       {/* Main Navbar */}
       <Navbar
@@ -136,12 +140,10 @@ function CalendarApp() {
               <CalendarIcon className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Bienvenido a <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Chronos</span>
+              Bienvenido a <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Calendario Derecho Pro</span>
             </h1>
             <p className="text-base text-slate-400 mt-3 leading-relaxed">
-              Tu calendario inteligente impulsado por FullCalendar, sincronización en tiempo real
-              en Cloud Firestore, importación de archivos ICS (ical.js) y desbloqueo biométrico
-              local WebAuthn.
+              Tu calendario completamente privado con FullCalendar, importación de archivos ICS y desbloqueo biométrico local.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -151,10 +153,10 @@ function CalendarApp() {
             {/* Architecture pill cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-12 w-full text-left">
               <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-                <Database className="w-5 h-5 text-indigo-400 mb-2" />
-                <h4 className="text-xs font-bold text-white">Cloud Firestore</h4>
+                <Shield className="w-5 h-5 text-indigo-400 mb-2" />
+                <h4 className="text-xs font-bold text-white">Privacidad Total</h4>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Reglas de seguridad estrictas que impiden el acceso entre usuarios.
+                  Acceso exclusivo a tu agenda con aislamiento de seguridad garantizado.
                 </p>
               </div>
 
@@ -198,21 +200,15 @@ function CalendarApp() {
         onClose={() => setBiometricsModalOpen(false)}
       />
 
-      {/* Tech Footer */}
+      {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/60 py-4 px-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-400">Chronos Calendar</span>
-            <span>•</span>
-            <span>React + Vite</span>
-            <span>•</span>
-            <span>Tailwind CSS</span>
-            <span>•</span>
-            <span>FullCalendar & ical.js</span>
+            <span className="font-semibold text-slate-400">hecho por Jorge Sevilla</span>
           </div>
           <div className="flex items-center gap-1.5 text-emerald-400/90 font-medium">
             <Shield className="w-3.5 h-3.5" />
-            <span>Firebase Auth + Cloud Firestore Seguros</span>
+            <span>informacion guardada en local no se sube informacion a la nube</span>
           </div>
         </div>
       </footer>

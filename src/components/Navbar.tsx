@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   onOpenNewEvent: () => void;
@@ -38,12 +39,12 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarPr
           </div>
           <div className="hidden sm:block">
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base tracking-tight text-white">Chronos</span>
+              <span className="font-extrabold text-base tracking-tight text-white">Calendario Derecho</span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 PRO
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Calendar & Schedule</p>
+            <p className="text-[11px] text-slate-400 font-medium">Privado & Seguro</p>
           </div>
         </div>
 
@@ -69,6 +70,9 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarPr
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* PWA Install Button */}
+          <PWAInstallButton />
+
           {/* Notifications Dropdown */}
           {currentUser && <NotificationDropdown />}
 
@@ -143,7 +147,7 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarPr
                     <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
                     <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-400">
                       <Shield className="w-3 h-3" />
-                      <span>Firestore Cloud Sync</span>
+                      <span>Sesión Privada Local</span>
                     </div>
                   </div>
 
