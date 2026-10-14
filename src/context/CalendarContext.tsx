@@ -10,7 +10,12 @@ import {
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './AuthContext';
-import { CalendarEventItem } from '../types/calendar';
+import {
+  CalendarEventItem,
+  CategoryOption,
+  CustomCategoryItem,
+  DEFAULT_CATEGORIES,
+} from '../types/calendar';
 
 interface CalendarContextType {
   events: CalendarEventItem[];
@@ -20,6 +25,10 @@ interface CalendarContextType {
   setSearchQuery: (q: string) => void;
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;
+  customCategories: CustomCategoryItem[];
+  allCategories: CategoryOption[];
+  createCustomCategory: (name: string, color: string) => Promise<string>;
+  deleteCustomCategory: (id: string) => Promise<void>;
   createEvent: (data: Omit<CalendarEventItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateEvent: (id: string, updates: Partial<CalendarEventItem>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
@@ -32,6 +41,7 @@ const CalendarContext = createContext<CalendarContextType | undefined>(undefined
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAuth();
   const [events, setEvents] = useState<CalendarEventItem[]>([]);
+  const [customCategories, setCustomCategories] = useState<CustomCategoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -69,10 +79,87 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [currentUser]);
 
+  // Firestore real-time listener for user custom categories
+  useEffect(() => {
+    if (!currentUser) {
+      setCustomCategories([]);
+      return;
+    }
+
+    const catPath = `users/${currentUser.uid}/categories`;
+    const catRef = collection(db, 'users', currentUser.uid, 'categories');
+
+    const unsubscribe = onSnapshot(
+      catRef,
+      (snapshot) => {
+        const items: CustomCategoryItem[] = [];
+        snapshot.forEach((docSnap) => {
+          items.push({
+            id: docSnap.id,
+            ...(docSnap.data() as Omit<CustomCategoryItem, 'id'>),
+          });
+        });
+        setCustomCategories(items);
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, catPath);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Combined categories list (default preset categories + user custom categories)
+  const allCategories = useMemo(() => {
+    const customs: CategoryOption[] = customCategories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      color: c.color,
+      isCustom: true,
+    }));
+    return [...DEFAULT_CATEGORIES, ...customs];
+  }, [customCategories]);
+
   // Clean and sanitize string helpers
   const sanitize = (str: string | undefined, max: number) => {
     if (!str) return undefined;
     return str.trim().slice(0, max);
+  };
+
+  const createCustomCategory = async (name: string, color: string): Promise<string> => {
+    if (!currentUser) throw new Error('No estás autenticado.');
+
+    const catId = 'cat_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
+    const catPath = `users/${currentUser.uid}/categories/${catId}`;
+    const nowISO = new Date().toISOString();
+
+    const payload: CustomCategoryItem = {
+      id: catId,
+      name: name.trim().slice(0, 50),
+      color: color.trim().slice(0, 32) || '#6366f1',
+      userId: currentUser.uid,
+      createdAt: nowISO,
+    };
+
+    try {
+      const docRef = doc(db, 'users', currentUser.uid, 'categories', catId);
+      await setDoc(docRef, payload);
+      return catId;
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, catPath);
+    }
+  };
+
+  const deleteCustomCategory = async (id: string): Promise<void> => {
+    if (!currentUser) throw new Error('No estás autenticado.');
+
+    const catPath = `users/${currentUser.uid}/categories/${id}`;
+    try {
+      const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
+      await deleteDoc(docRef);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, catPath);
+    }
   };
 
   const createEvent = async (
@@ -151,7 +238,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (newEvents.length === 0) return 0;
 
     let importedCount = 0;
-    const chunkSize = 250; // Firestore batch limit safe threshold
+    const chunkSize = 250;
 
     for (let i = 0; i < newEvents.length; i += chunkSize) {
       const chunk = newEvents.slice(i, i + chunkSize);
@@ -235,6 +322,10 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         setSearchQuery,
         selectedCategory,
         setSelectedCategory,
+        customCategories,
+        allCategories,
+        createCustomCategory,
+        deleteCustomCategory,
         createEvent,
         updateEvent,
         deleteEvent,

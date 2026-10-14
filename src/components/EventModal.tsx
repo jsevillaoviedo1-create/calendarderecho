@@ -20,7 +20,7 @@ interface EventModalProps {
 }
 
 export function EventModal({ isOpen, event, onClose }: EventModalProps) {
-  const { createEvent, updateEvent, deleteEvent } = useCalendar();
+  const { createEvent, updateEvent, deleteEvent, allCategories, createCustomCategory } = useCalendar();
   const { notifyEventChange } = useNotifications();
 
   const isEditing = Boolean(event?.id);
@@ -38,6 +38,11 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Quick custom category creation
+  const [showNewCatInput, setShowNewCatInput] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatColor, setNewCatColor] = useState('#8b5cf6');
 
   useEffect(() => {
     if (event) {
@@ -240,7 +245,7 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
               <span>Categoría</span>
             </label>
             <div className="flex flex-wrap gap-2">
-              {DEFAULT_CATEGORIES.map((cat) => (
+              {allCategories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
@@ -258,7 +263,65 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
                   <span>{cat.name}</span>
                 </button>
               ))}
+
+              <button
+                type="button"
+                onClick={() => setShowNewCatInput(!showNewCatInput)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 transition-all flex items-center gap-1 cursor-pointer"
+              >
+                <span>+ Nueva Categoría</span>
+              </button>
             </div>
+
+            {/* Inline new category form */}
+            {showNewCatInput && (
+              <div className="mt-3 p-3 rounded-xl bg-slate-950/80 border border-indigo-500/30 space-y-2 animate-in fade-in duration-150">
+                <span className="text-[11px] font-semibold text-slate-300 block">
+                  Añadir categoría personalizada
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nombre (ej. Audiencias, Clientes VIP)"
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  <input
+                    type="color"
+                    value={newCatColor}
+                    onChange={(e) => setNewCatColor(e.target.value)}
+                    className="w-7 h-7 rounded cursor-pointer border-0 bg-transparent shrink-0"
+                    title="Elegir color"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!newCatName.trim()) return;
+                      try {
+                        await createCustomCategory(newCatName.trim(), newCatColor);
+                        handleCategorySelect(newCatName.trim(), newCatColor);
+                        setNewCatName('');
+                        setShowNewCatInput(false);
+                      } catch (err: any) {
+                        setError(err.message || 'Error creando categoría');
+                      }
+                    }}
+                    disabled={!newCatName.trim()}
+                    className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCatInput(false)}
+                    className="text-xs text-slate-400 hover:text-white px-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* All day toggle */}

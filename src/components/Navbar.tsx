@@ -14,6 +14,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Sparkles,
+  Tag,
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -22,9 +23,10 @@ interface NavbarProps {
   onOpenNewEvent: () => void;
   onOpenICS: () => void;
   onOpenBiometrics: () => void;
+  onOpenCategories?: () => void;
 }
 
-export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarProps) {
+export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics, onOpenCategories }: NavbarProps) {
   const { currentUser, userProfile, logout, lockSession, isBiometricEnrolled } = useAuth();
   const { searchQuery, setSearchQuery } = useCalendar();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -96,6 +98,18 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarPr
             </button>
           )}
 
+          {/* Categories Manager Button */}
+          {currentUser && onOpenCategories && (
+            <button
+              onClick={onOpenCategories}
+              title="Gestionar y crear categorías personalizadas"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+            >
+              <Tag className="w-4 h-4 text-emerald-400" />
+              <span className="hidden md:inline">Categorías</span>
+            </button>
+          )}
+
           {/* Import ICS */}
           <button
             onClick={onOpenICS}
@@ -164,6 +178,19 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics }: NavbarPr
                         </p>
                       </div>
                     </button>
+
+                    {onOpenCategories && (
+                      <button
+                        onClick={onOpenCategories}
+                        className="w-full px-3 py-2 text-xs text-left text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                      >
+                        <Tag className="w-4 h-4 text-emerald-400" />
+                        <div>
+                          <span>Gestionar Categorías</span>
+                          <p className="text-[10px] text-slate-400">Crear y personalizar etiquetas</p>
+                        </div>
+                      </button>
+                    )}
 
                     <button
                       onClick={lockSession}

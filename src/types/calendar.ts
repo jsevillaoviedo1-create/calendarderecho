@@ -41,14 +41,22 @@ export interface CategoryOption {
   id: string;
   name: string;
   color: string;
-  bgClass: string;
+  isCustom?: boolean;
+}
+
+export interface CustomCategoryItem {
+  id: string;
+  name: string;
+  color: string;
+  userId: string;
+  createdAt: string;
 }
 
 export const DEFAULT_CATEGORIES: CategoryOption[] = [
-  { id: 'work', name: 'Trabajo', color: '#6366f1', bgClass: 'bg-indigo-500' },
-  { id: 'personal', name: 'Personal', color: '#10b981', bgClass: 'bg-emerald-500' },
-  { id: 'study', name: 'Estudio', color: '#f59e0b', bgClass: 'bg-amber-500' },
-  { id: 'health', name: 'Salud & Deporte', color: '#ec4899', bgClass: 'bg-pink-500' },
-  { id: 'finance', name: 'Finanzas', color: '#8b5cf6', bgClass: 'bg-purple-500' },
-  { id: 'important', name: 'Urgente', color: '#ef4444', bgClass: 'bg-red-500' },
+  { id: 'work', name: 'Trabajo', color: '#6366f1' },
+  { id: 'personal', name: 'Personal', color: '#10b981' },
+  { id: 'study', name: 'Estudio', color: '#f59e0b' },
+  { id: 'health', name: 'Salud & Deporte', color: '#ec4899' },
+  { id: 'finance', name: 'Finanzas', color: '#8b5cf6' },
+  { id: 'important', name: 'Urgente', color: '#ef4444' },
 ];

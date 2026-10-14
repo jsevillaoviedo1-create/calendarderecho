@@ -20,10 +20,11 @@ import {
 interface CalendarViewProps {
   onSelectDate: (dateStr: string, allDay: boolean) => void;
   onSelectEvent: (event: CalendarEventItem) => void;
+  onOpenCategoryManager?: () => void;
 }
 
-export function CalendarView({ onSelectDate, onSelectEvent }: CalendarViewProps) {
-  const { filteredEvents, updateEvent, selectedCategory, setSelectedCategory, loading } = useCalendar();
+export function CalendarView({ onSelectDate, onSelectEvent, onOpenCategoryManager }: CalendarViewProps) {
+  const { filteredEvents, updateEvent, selectedCategory, setSelectedCategory, allCategories, loading } = useCalendar();
   const calendarRef = useRef<FullCalendar | null>(null);
 
   // FullCalendar event source transformation
@@ -139,7 +140,7 @@ export function CalendarView({ onSelectDate, onSelectEvent }: CalendarViewProps)
             Todas ({filteredEvents.length})
           </button>
 
-          {DEFAULT_CATEGORIES.map((cat) => (
+          {allCategories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.name)}
@@ -156,6 +157,16 @@ export function CalendarView({ onSelectDate, onSelectEvent }: CalendarViewProps)
               <span>{cat.name}</span>
             </button>
           ))}
+
+          {onOpenCategoryManager && (
+            <button
+              onClick={onOpenCategoryManager}
+              title="Gestionar y crear categorías personalizadas"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 border border-indigo-500/30"
+            >
+              <span>+ Categoría</span>
+            </button>
+          )}
         </div>
 
         {/* Quick stats badge */}

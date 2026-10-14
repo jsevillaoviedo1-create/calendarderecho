@@ -72,6 +72,15 @@ service cloud.firestore {
         (!('read' in data) || data.read is bool);
     }
 
+    function isValidCustomCategory(data, userId) {
+      return data.keys().hasAll(['name', 'color', 'userId', 'createdAt']) &&
+        data.keys().hasOnly(['name', 'color', 'userId', 'createdAt']) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 50 &&
+        data.color is string && data.color.size() <= 32 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
     // Diagnostics / health check
     match /test/{testId} {
       allow get: if true;
@@ -106,6 +115,17 @@ service cloud.firestore {
                       isValidNotification(incoming(), userId) &&
                       incoming().userId == existing().userId;
         allow delete: if isOwner(userId) && isValidId(userId) && isValidId(notificationId);
+      }
+
+      // User custom categories
+      match /categories/{categoryId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(categoryId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(categoryId) && isValidCustomCategory(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(categoryId) &&
+                      isValidCustomCategory(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(categoryId);
       }
     }
   }

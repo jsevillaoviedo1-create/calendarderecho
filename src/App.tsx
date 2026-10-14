@@ -13,6 +13,7 @@ import { EventModal } from './components/EventModal';
 import { ICSImportModal } from './components/ICSImportModal';
 import { BiometricLockModal } from './components/BiometricLockModal';
 import { BiometricSettingsModal } from './components/BiometricSettingsModal';
+import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { AuthModal } from './components/AuthModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { CalendarEventItem } from './types/calendar';
@@ -34,6 +35,7 @@ function CalendarApp() {
   const [selectedEvent, setSelectedEvent] = useState<Partial<CalendarEventItem> | null>(null);
   const [icsModalOpen, setIcsModalOpen] = useState(false);
   const [biometricsModalOpen, setBiometricsModalOpen] = useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
   // New event trigger
@@ -82,6 +84,7 @@ function CalendarApp() {
         onOpenNewEvent={handleOpenNewEvent}
         onOpenICS={() => setIcsModalOpen(true)}
         onOpenBiometrics={() => setBiometricsModalOpen(true)}
+        onOpenCategories={() => setCategoryModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -131,6 +134,7 @@ function CalendarApp() {
             <CalendarView
               onSelectDate={handleSelectDate}
               onSelectEvent={handleSelectEvent}
+              onOpenCategoryManager={() => setCategoryModalOpen(true)}
             />
           </>
         ) : (
@@ -198,6 +202,11 @@ function CalendarApp() {
       <BiometricSettingsModal
         isOpen={biometricsModalOpen}
         onClose={() => setBiometricsModalOpen(false)}
+      />
+
+      <CategoryManagerModal
+        isOpen={categoryModalOpen}
+        onClose={() => setCategoryModalOpen(false)}
       />
 
       {/* Footer */}

@@ -150,6 +150,34 @@
         }
       },
       "required": ["title", "body", "type", "userId", "createdAt"]
+    },
+    "CustomCategory": {
+      "title": "CustomCategory",
+      "description": "User-defined custom calendar category tag and color",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the category",
+          "maxLength": 50,
+          "minLength": 1
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color code",
+          "maxLength": 32
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["name", "color", "userId", "createdAt"]
     }
   },
   "firestore": {
@@ -164,6 +192,10 @@
     "/users/{userId}/notifications/{notificationId}": {
       "schema": "AppNotification",
       "description": "User-isolated push notifications and calendar alerts"
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": "CustomCategory",
+      "description": "User-isolated custom calendar categories"
     }
   }
 }
