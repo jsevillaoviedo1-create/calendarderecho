@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['email', 'createdAt']) &&
+        data.keys().hasOnly(['email', 'createdAt', 'displayName', 'photoURL', 'biometricEnabled', 'biometricCredentialId', 'defaultView', 'fcmToken', 'notificationsEnabled', 'updatedAt']) &&
+        data.email is string && data.email.size() <= 255 &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 1000)) &&
+        (!('biometricEnabled' in data) || data.biometricEnabled is bool) &&
+        (!('biometricCredentialId' in data) || (data.biometricCredentialId is string && data.biometricCredentialId.size() <= 512)) &&
+        (!('defaultView' in data) || (data.defaultView is string && data.defaultView.size() <= 50)) &&
+        (!('fcmToken' in data) || (data.fcmToken is string && data.fcmToken.size() <= 512)) &&
+        (!('notificationsEnabled' in data) || data.notificationsEnabled is bool) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function isValidCalendarEvent(data, userId) {
+      return data.keys().hasAll(['title', 'start', 'userId']) &&
+        data.keys().hasOnly(['title', 'start', 'userId', 'description', 'location', 'end', 'allDay', 'color', 'category', 'createdAt', 'updatedAt']) &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.start is string && data.start.size() >= 1 && data.start.size() <= 50 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 3000)) &&
+        (!('location' in data) || (data.location is string && data.location.size() <= 500)) &&
+        (!('end' in data) || (data.end is string && data.end.size() <= 50)) &&
+        (!('allDay' in data) || data.allDay is bool) &&
+        (!('color' in data) || (data.color is string && data.color.size() <= 32)) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 50)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function isValidNotification(data, userId) {
+      return data.keys().hasAll(['title', 'body', 'type', 'userId', 'createdAt']) &&
+        data.keys().hasOnly(['title', 'body', 'type', 'userId', 'createdAt', 'eventId', 'read']) &&
+        data.title is string && data.title.size() <= 200 &&
+        data.body is string && data.body.size() <= 1000 &&
+        data.type is string && data.type.size() <= 50 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('eventId' in data) || (data.eventId is string && data.eventId.size() <= 128)) &&
+        (!('read' in data) || data.read is bool);
+    }
+
+    // Diagnostics / health check
+    match /test/{testId} {
+      allow get: if true;
+      allow list, write: if false;
+    }
+
+    // User profile and preferences
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if false;
+
+      // User calendar events collection
+      match /events/{eventId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(eventId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(eventId) && isValidCalendarEvent(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(eventId) &&
+                      isValidCalendarEvent(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(eventId);
+      }
+
+      // User push notifications and alerts
+      match /notifications/{notificationId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(notificationId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(notificationId) && isValidNotification(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(notificationId) &&
+                      isValidNotification(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(notificationId);
+      }
+    }
+  }
+}

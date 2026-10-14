@@ -1,0 +1,6 @@
+{
+  "name": "Chronos Calendar & Schedule",
+  "description": "Calendario inteligente con FullCalendar, sincronización en Cloud Firestore, importación ICS y autenticación biométrica WebAuthn.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

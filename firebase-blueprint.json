@@ -1,0 +1,169 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile settings, preferences, local biometric data and FCM push notification config",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 255
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 100
+        },
+        "biometricEnabled": {
+          "type": "boolean",
+          "description": "Whether WebAuthn local biometric unlocking is enabled"
+        },
+        "biometricCredentialId": {
+          "type": "string",
+          "description": "WebAuthn credential ID for local session verification",
+          "maxLength": 512
+        },
+        "fcmToken": {
+          "type": "string",
+          "description": "Firebase Cloud Messaging device push registration token",
+          "maxLength": 512
+        },
+        "notificationsEnabled": {
+          "type": "boolean",
+          "description": "Whether FCM and browser push notifications are enabled"
+        },
+        "defaultView": {
+          "type": "string",
+          "description": "Default FullCalendar view (dayGridMonth, timeGridWeek, timeGridDay, listWeek)",
+          "maxLength": 50
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "CalendarEvent": {
+      "title": "CalendarEvent",
+      "description": "Personal calendar event scheduled by the authenticated user",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Event title or summary",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional notes or details about the event",
+          "maxLength": 3000
+        },
+        "location": {
+          "type": "string",
+          "description": "Event location, venue or video link",
+          "maxLength": 500
+        },
+        "start": {
+          "type": "string",
+          "description": "ISO 8601 start date-time or date string",
+          "maxLength": 50
+        },
+        "end": {
+          "type": "string",
+          "description": "ISO 8601 end date-time or date string",
+          "maxLength": 50
+        },
+        "allDay": {
+          "type": "boolean",
+          "description": "Whether the event occupies the entire day"
+        },
+        "color": {
+          "type": "string",
+          "description": "Hex color code or category tag color",
+          "maxLength": 32
+        },
+        "category": {
+          "type": "string",
+          "description": "Event category tag",
+          "maxLength": 50
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase UID of event owner",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Event creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last modification timestamp"
+        }
+      },
+      "required": ["title", "start", "userId"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "Push notification or calendar event alert delivered to the user",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Notification title",
+          "maxLength": 200
+        },
+        "body": {
+          "type": "string",
+          "description": "Notification content body",
+          "maxLength": 1000
+        },
+        "type": {
+          "type": "string",
+          "description": "Notification type (upcoming_event, event_created, event_updated, ics_imported)",
+          "maxLength": 50
+        },
+        "eventId": {
+          "type": "string",
+          "description": "ID of associated event if any",
+          "maxLength": 128
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Whether notification has been marked as read"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["title", "body", "type", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores user configuration, preferences, WebAuthn credentials and FCM tokens"
+    },
+    "/users/{userId}/events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "User-isolated calendar events"
+    },
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": "AppNotification",
+      "description": "User-isolated push notifications and calendar alerts"
+    }
+  }
+}
