@@ -11,15 +11,36 @@ import {
   Trash2,
   X,
   Check,
+  ExternalLink,
+  Navigation,
+  SlidersHorizontal,
+  Sparkles,
+  Plus,
 } from 'lucide-react';
 
 interface EventModalProps {
   isOpen: boolean;
   event: Partial<CalendarEventItem> | null;
   onClose: () => void;
+  onOpenCategoryManager?: () => void;
 }
 
-export function EventModal({ isOpen, event, onClose }: EventModalProps) {
+const PRESET_COLORS = [
+  '#6366f1', // Indigo
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#ef4444', // Red
+  '#f97316', // Orange
+  '#f59e0b', // Amber
+  '#10b981', // Emerald
+  '#06b6d4', // Cyan
+  '#3b82f6', // Blue
+  '#14b8a6', // Teal
+  '#a855f7', // Purple
+  '#64748b', // Slate
+];
+
+export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: EventModalProps) {
   const { createEvent, updateEvent, deleteEvent, allCategories, createCustomCategory } = useCalendar();
   const { notifyEventChange } = useNotifications();
 
@@ -43,6 +64,8 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
   const [showNewCatInput, setShowNewCatInput] = useState(false);
   const [newCatName, setNewCatName] = useState('');
   const [newCatColor, setNewCatColor] = useState('#8b5cf6');
+  const [creatingCat, setCreatingCat] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
 
   useEffect(() => {
     if (event) {
@@ -102,6 +125,68 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
   const handleCategorySelect = (catName: string, catColor: string) => {
     setCategory(catName);
     setColor(catColor);
+  };
+
+  const handleSaveInlineCategory = async () => {
+    if (!newCatName.trim()) return;
+    setCreatingCat(true);
+    setError(null);
+    try {
+      await createCustomCategory(newCatName.trim(), newCatColor);
+      handleCategorySelect(newCatName.trim(), newCatColor);
+      setNewCatName('');
+      setShowNewCatInput(false);
+    } catch (err: any) {
+      setError(err.message || 'Error creando la categoría');
+    } finally {
+      setCreatingCat(false);
+    }
+  };
+
+  const handleOpenGoogleMaps = () => {
+    const query = location.trim();
+    const url = query
+      ? (query.startsWith('http://') || query.startsWith('https://')
+          ? query
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`)
+      : 'https://www.google.com/maps';
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleGetGPS = () => {
+    if (!navigator.geolocation) {
+      setError('Tu navegador no soporta geolocalización.');
+      return;
+    }
+    setGpsLoading(true);
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lng = position.coords.longitude.toFixed(6);
+        try {
+          const resp = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+            { signal: AbortSignal.timeout(3500) }
+          );
+          const data = await resp.json();
+          if (data && data.display_name) {
+            setLocation(data.display_name);
+          } else {
+            setLocation(`Ubicación GPS (${lat}, ${lng})`);
+          }
+        } catch {
+          setLocation(`Ubicación GPS (${lat}, ${lng})`);
+        } finally {
+          setGpsLoading(false);
+        }
+      },
+      (err) => {
+        setGpsLoading(false);
+        setError(`No se pudo obtener la ubicación GPS: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -240,85 +325,173 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
 
           {/* Category Picker */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-slate-500" />
-              <span>Categoría</span>
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Categoría</span>
+              </label>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCatInput(!showNewCatInput)}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1 cursor-pointer ${
+                    showNewCatInput
+                      ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                      : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                  }`}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Crear propia</span>
+                </button>
+
+                {onOpenCategoryManager && (
+                  <button
+                    type="button"
+                    onClick={onOpenCategoryManager}
+                    className="text-xs text-slate-400 hover:text-white font-medium flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-colors cursor-pointer"
+                    title="Abrir gestor de categorías"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    <span>Gestionar</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* List of Category Pills */}
             <div className="flex flex-wrap gap-2">
               {allCategories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
                   onClick={() => handleCategorySelect(cat.name, cat.color)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 border cursor-pointer ${
                     category === cat.name
-                      ? 'bg-slate-800 text-white border-indigo-400/80 ring-2 ring-indigo-500/20'
+                      ? 'bg-slate-800 text-white border-indigo-400/80 ring-2 ring-indigo-500/20 shadow-sm'
                       : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200 hover:bg-slate-800/40'
                   }`}
                 >
                   <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
                     style={{ backgroundColor: cat.color }}
                   />
                   <span>{cat.name}</span>
+                  {cat.isCustom && (
+                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                      propia
+                    </span>
+                  )}
                 </button>
               ))}
 
+              {/* Prominent button to add category right in the pills row */}
               <button
                 type="button"
                 onClick={() => setShowNewCatInput(!showNewCatInput)}
-                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 transition-all flex items-center gap-1 cursor-pointer"
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                  showNewCatInput
+                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                    : 'text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/30 border-dashed'
+                }`}
               >
+                <Plus className="w-3.5 h-3.5" />
                 <span>+ Nueva Categoría</span>
               </button>
             </div>
 
             {/* Inline new category form */}
             {showNewCatInput && (
-              <div className="mt-3 p-3 rounded-xl bg-slate-950/80 border border-indigo-500/30 space-y-2 animate-in fade-in duration-150">
-                <span className="text-[11px] font-semibold text-slate-300 block">
-                  Añadir categoría personalizada
-                </span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Nombre (ej. Audiencias, Clientes VIP)"
-                    value={newCatName}
-                    onChange={(e) => setNewCatName(e.target.value)}
-                    className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  />
-                  <input
-                    type="color"
-                    value={newCatColor}
-                    onChange={(e) => setNewCatColor(e.target.value)}
-                    className="w-7 h-7 rounded cursor-pointer border-0 bg-transparent shrink-0"
-                    title="Elegir color"
-                  />
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (!newCatName.trim()) return;
-                      try {
-                        await createCustomCategory(newCatName.trim(), newCatColor);
-                        handleCategorySelect(newCatName.trim(), newCatColor);
-                        setNewCatName('');
-                        setShowNewCatInput(false);
-                      } catch (err: any) {
-                        setError(err.message || 'Error creando categoría');
-                      }
-                    }}
-                    disabled={!newCatName.trim()}
-                    className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-sm disabled:opacity-50 cursor-pointer"
-                  >
-                    Guardar
-                  </button>
+              <div className="mt-3 p-3.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 space-y-3 shadow-xl animate-in fade-in duration-150">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Crear categoría propia</span>
+                  </span>
                   <button
                     type="button"
                     onClick={() => setShowNewCatInput(false)}
-                    className="text-xs text-slate-400 hover:text-white px-1"
+                    className="text-xs text-slate-400 hover:text-white p-1 rounded-md hover:bg-slate-800 cursor-pointer"
                   >
-                    ✕
+                    <X className="w-4 h-4" />
                   </button>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                    Nombre de la categoría *
+                  </label>
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Ej. Audiencias, Clientes VIP, Expedientes, Juicios..."
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center justify-between">
+                    <span>Color distintivo</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-400 font-mono">{newCatColor}</span>
+                      <input
+                        type="color"
+                        value={newCatColor}
+                        onChange={(e) => setNewCatColor(e.target.value)}
+                        className="w-5 h-5 rounded cursor-pointer border-0 bg-transparent"
+                        title="Elegir color personalizado"
+                      />
+                    </div>
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {PRESET_COLORS.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewCatColor(c)}
+                        className={`w-6 h-6 rounded-lg transition-transform cursor-pointer flex items-center justify-center ${
+                          newCatColor === c ? 'scale-110 ring-2 ring-white shadow-md' : 'hover:scale-105'
+                        }`}
+                        style={{ backgroundColor: c }}
+                      >
+                        {newCatColor === c && <Check className="w-3 h-3 text-white drop-shadow" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-slate-400">Vista previa:</span>
+                    <span
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 shadow-sm"
+                      style={{ backgroundColor: newCatColor }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      <span>{newCatName.trim() || 'Nombre de categoría'}</span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowNewCatInput(false)}
+                      className="px-2.5 py-1.5 text-xs text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveInlineCategory}
+                      disabled={!newCatName.trim() || creatingCat}
+                      className="px-3.5 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{creatingCat ? 'Guardando...' : 'Crear y Asignar'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -390,19 +563,100 @@ export function EventModal({ isOpen, event, onClose }: EventModalProps) {
             </div>
           </div>
 
-          {/* Location */}
+          {/* Location & Google Maps */}
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-slate-500" />
-              <span>Ubicación o enlace</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Ej. Sala A, Zoom, Google Meet o dirección"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-            />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                <span>Lugar / Ubicación (Google Maps)</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleOpenGoogleMaps}
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                title="Abrir Google Maps para buscar y copiar una ubicación"
+              >
+                <ExternalLink className="w-3 h-3" />
+                <span>Abrir Google Maps</span>
+              </button>
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Ej. Juzgado de 1ª Instancia nº 4, Plaza Castilla, Madrid, o enlace..."
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-3 pr-24 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              />
+
+              {/* Action buttons inside input */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {location.trim() && (
+                  <button
+                    type="button"
+                    onClick={handleOpenGoogleMaps}
+                    title="Ver este lugar en Google Maps"
+                    className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleGetGPS}
+                  disabled={gpsLoading}
+                  title="Obtener ubicación actual con GPS del dispositivo"
+                  className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin text-indigo-400' : ''}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Google Maps quick access and action chips */}
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <button
+                type="button"
+                onClick={handleOpenGoogleMaps}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors cursor-pointer shadow-xs"
+              >
+                <span className="text-rose-400">📍</span>
+                <span>{location.trim() ? 'Ver en Google Maps' : 'Buscar en Google Maps'}</span>
+                <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGetGPS}
+                disabled={gpsLoading}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors cursor-pointer shadow-xs"
+              >
+                <Navigation className={`w-3 h-3 text-indigo-400 ${gpsLoading ? 'animate-spin' : ''}`} />
+                <span>{gpsLoading ? 'Obteniendo GPS...' : 'Usar mi GPS'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.open('https://www.google.com/maps/search/Juzgados+y+tribunales', '_blank', 'noopener,noreferrer');
+                }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition-colors cursor-pointer shadow-xs"
+              >
+                <span>🏛️ Juzgados cercanos</span>
+              </button>
+
+              {location.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setLocation('')}
+                  className="text-[11px] text-slate-500 hover:text-rose-400 px-1 py-0.5 cursor-pointer ml-auto"
+                >
+                  Limpiar lugar
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Description */}

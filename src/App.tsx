@@ -192,6 +192,7 @@ function CalendarApp() {
           setEventModalOpen(false);
           setSelectedEvent(null);
         }}
+        onOpenCategoryManager={() => setCategoryModalOpen(true)}
       />
 
       <ICSImportModal
