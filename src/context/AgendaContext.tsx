@@ -6,6 +6,7 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './AuthContext';
@@ -115,7 +116,15 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       },
       (error) => {
-        handleFirestoreError(error, OperationType.GET, tasksPath);
+        console.error('Agenda Firestore subscription error:', error);
+        try {
+          const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (saved) {
+            setTasks(JSON.parse(saved));
+          }
+        } catch {
+          // Keep current state
+        }
         setLoading(false);
       }
     );
@@ -149,8 +158,8 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       updatedAt: nowISO,
     };
 
-    if (data.description) payload.description = data.description.trim().slice(0, 2000);
-    if (data.time) payload.time = data.time.trim().slice(0, 50);
+    if (data.description?.trim()) payload.description = data.description.trim().slice(0, 2000);
+    if (data.time?.trim()) payload.time = data.time.trim().slice(0, 50);
     if (data.semester) payload.semester = data.semester;
     if (data.subject) payload.subject = data.subject;
     if (data.priority) payload.priority = data.priority;
@@ -184,7 +193,9 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
     };
 
     if (updates.title) cleanUpdates.title = updates.title.trim().slice(0, 200);
-    if (updates.description !== undefined) cleanUpdates.description = updates.description.trim().slice(0, 2000);
+    if (updates.description !== undefined) {
+      cleanUpdates.description = updates.description ? updates.description.trim().slice(0, 2000) : '';
+    }
 
     setTasks((prev) => {
       const next = prev.map((t) => (t.id === id ? { ...t, ...cleanUpdates } : t));
@@ -196,7 +207,15 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       const taskPath = `users/${currentUser.uid}/agenda_tasks/${id}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'agenda_tasks', id);
-        await updateDoc(docRef, cleanUpdates as any);
+        const firestoreData: Record<string, any> = {};
+        for (const [key, value] of Object.entries(cleanUpdates)) {
+          if (value !== undefined) {
+            firestoreData[key] = value;
+          } else if (key === 'completedAt') {
+            firestoreData[key] = deleteField();
+          }
+        }
+        await updateDoc(docRef, firestoreData);
       } catch (error) {
         handleFirestoreError(error, OperationType.UPDATE, taskPath);
       }

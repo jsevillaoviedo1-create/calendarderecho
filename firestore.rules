@@ -10,7 +10,7 @@ service cloud.firestore {
 
     // Helper functions
     function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128;
     }
 
     function incoming() {
@@ -31,9 +31,10 @@ service cloud.firestore {
 
     function isValidUserProfile(data) {
       return data.keys().hasAll(['email', 'createdAt']) &&
-        data.keys().hasOnly(['email', 'createdAt', 'displayName', 'photoURL', 'biometricEnabled', 'biometricCredentialId', 'defaultView', 'fcmToken', 'notificationsEnabled', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'email', 'createdAt', 'displayName', 'photoURL', 'biometricEnabled', 'biometricCredentialId', 'defaultView', 'fcmToken', 'notificationsEnabled', 'updatedAt']) &&
         data.email is string && data.email.size() <= 255 &&
         data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
         (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
         (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 1000)) &&
         (!('biometricEnabled' in data) || data.biometricEnabled is bool) &&
@@ -46,10 +47,11 @@ service cloud.firestore {
 
     function isValidCalendarEvent(data, userId) {
       return data.keys().hasAll(['title', 'start', 'userId']) &&
-        data.keys().hasOnly(['title', 'start', 'userId', 'description', 'location', 'end', 'allDay', 'color', 'category', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'title', 'start', 'userId', 'description', 'location', 'end', 'allDay', 'color', 'category', 'createdAt', 'updatedAt']) &&
         data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
         data.start is string && data.start.size() >= 1 && data.start.size() <= 50 &&
         data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
         (!('description' in data) || (data.description is string && data.description.size() <= 3000)) &&
         (!('location' in data) || (data.location is string && data.location.size() <= 500)) &&
         (!('end' in data) || (data.end is string && data.end.size() <= 50)) &&
@@ -62,33 +64,36 @@ service cloud.firestore {
 
     function isValidNotification(data, userId) {
       return data.keys().hasAll(['title', 'body', 'type', 'userId', 'createdAt']) &&
-        data.keys().hasOnly(['title', 'body', 'type', 'userId', 'createdAt', 'eventId', 'read']) &&
+        data.keys().hasOnly(['id', 'title', 'body', 'type', 'userId', 'createdAt', 'eventId', 'read']) &&
         data.title is string && data.title.size() <= 200 &&
         data.body is string && data.body.size() <= 1000 &&
         data.type is string && data.type.size() <= 50 &&
         data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
         data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
         (!('eventId' in data) || (data.eventId is string && data.eventId.size() <= 128)) &&
         (!('read' in data) || data.read is bool);
     }
 
     function isValidCustomCategory(data, userId) {
       return data.keys().hasAll(['name', 'color', 'userId', 'createdAt']) &&
-        data.keys().hasOnly(['name', 'color', 'userId', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'name', 'color', 'userId', 'createdAt']) &&
         data.name is string && data.name.size() >= 1 && data.name.size() <= 50 &&
         data.color is string && data.color.size() <= 32 &&
         data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
-        data.createdAt is string && data.createdAt.size() <= 50;
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 128));
     }
 
     function isValidAgendaTask(data, userId) {
       return data.keys().hasAll(['title', 'date', 'userId', 'completed', 'createdAt']) &&
-        data.keys().hasOnly(['title', 'date', 'userId', 'completed', 'createdAt', 'description', 'time', 'semester', 'subject', 'completedAt', 'priority', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'title', 'date', 'userId', 'completed', 'createdAt', 'description', 'time', 'semester', 'subject', 'completedAt', 'priority', 'updatedAt']) &&
         data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
         data.date is string && data.date.size() >= 1 && data.date.size() <= 50 &&
         data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
         data.completed is bool &&
         data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
         (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
         (!('time' in data) || (data.time is string && data.time.size() <= 50)) &&
         (!('semester' in data) || (data.semester is string && data.semester.size() <= 50)) &&

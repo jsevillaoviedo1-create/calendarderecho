@@ -111,9 +111,40 @@ export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScan
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setImagePreview(result);
-      setImageBase64(result);
+      const dataUrl = e.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 2000;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const optimized = canvas.toDataURL('image/jpeg', 0.92);
+            setImagePreview(optimized);
+            setImageBase64(optimized);
+            setMimeType('image/jpeg');
+            return;
+          }
+        }
+        setImagePreview(dataUrl);
+        setImageBase64(dataUrl);
+      };
+      img.onerror = () => {
+        setImagePreview(dataUrl);
+        setImageBase64(dataUrl);
+      };
+      img.src = dataUrl;
     };
     reader.onerror = () => {
       setError('Error al leer el archivo de imagen.');
@@ -299,16 +330,26 @@ export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScan
         // 2. Optionally create agenda task for day-by-day view
         if (alsoAddToAgenda) {
           try {
+            let semester: '1er semestre' | '2o semestre' | 'General' = '1er semestre';
+            let matchedSubject: string = draft.title;
+
+            const lowerTitle = draft.title.toLowerCase();
+            if (lowerTitle.includes('constitucional') || lowerTitle.includes('civil') || lowerTitle.includes('penal') || lowerTitle.includes('internacional')) {
+              semester = '2o semestre';
+            } else if (lowerTitle.includes('romano') || lowerTitle.includes('historia') || lowerTitle.includes('eclesi') || lowerTitle.includes('econom') || lowerTitle.includes('teor')) {
+              semester = '1er semestre';
+            }
+
             await createTask({
               title: draft.title,
               date: draft.date,
               time: draft.startTime,
-              location: draft.location || undefined,
-              subject: draft.title,
-              description: draft.location ? `Aula / Lugar: ${draft.location}` : undefined,
+              semester,
+              subject: matchedSubject,
+              description: draft.location ? `Ubicación: ${draft.location}${draft.description ? ` • ${draft.description}` : ''}` : draft.description,
               completed: false,
-              priority: draft.category === 'Urgencia' ? 'urgente' : draft.category.includes('Examen') ? 'alta' : 'media',
-            } as any);
+              priority: draft.category === 'Urgencia' ? 'urgente' : draft.category.includes('Examen') || draft.category.includes('Parcial') ? 'alta' : 'media',
+            });
           } catch (e) {
             console.warn('Could not add to agenda task', e);
           }

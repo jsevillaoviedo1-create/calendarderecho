@@ -178,6 +178,77 @@
         }
       },
       "required": ["name", "color", "userId", "createdAt"]
+    },
+    "AgendaTask": {
+      "title": "AgendaTask",
+      "description": "Task, subject note, assignment or study topic in the user agenda",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique task identifier",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Task or topic title",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional notes or details",
+          "maxLength": 2000
+        },
+        "date": {
+          "type": "string",
+          "description": "Target date string (YYYY-MM-DD)",
+          "maxLength": 50
+        },
+        "time": {
+          "type": "string",
+          "description": "Optional scheduled time (HH:MM)",
+          "maxLength": 50
+        },
+        "semester": {
+          "type": "string",
+          "description": "Academic semester (1er semestre, 2o semestre, General)",
+          "maxLength": 50
+        },
+        "subject": {
+          "type": "string",
+          "description": "Academic subject name",
+          "maxLength": 100
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Completion state of the task"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Completion timestamp",
+          "maxLength": 50
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level (baja, media, alta, urgente)",
+          "maxLength": 50
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last modification timestamp"
+        }
+      },
+      "required": ["title", "date", "userId", "completed", "createdAt"]
     }
   },
   "firestore": {
@@ -196,6 +267,10 @@
     "/users/{userId}/categories/{categoryId}": {
       "schema": "CustomCategory",
       "description": "User-isolated custom calendar categories"
+    },
+    "/users/{userId}/agenda_tasks/{taskId}": {
+      "schema": "AgendaTask",
+      "description": "User-isolated agenda tasks and study topics"
     }
   }
 }
