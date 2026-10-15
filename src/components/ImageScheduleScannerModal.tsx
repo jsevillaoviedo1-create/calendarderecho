@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCalendar } from '../context/CalendarContext';
 import { useAgenda } from '../context/AgendaContext';
+import { useAuth } from '../context/AuthContext';
 import {
   Camera,
   Upload,
@@ -47,6 +48,7 @@ const isValidISODate = (value: string) => {
 export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScannerModalProps) {
   const { allCategories, createEvent } = useCalendar();
   const { createTask } = useAgenda();
+  const { currentUser } = useAuth();
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -121,7 +123,7 @@ export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScan
       const dataUrl = e.target?.result as string;
       const img = new Image();
       img.onload = () => {
-        const maxDim = 2000;
+        const maxDim = 1800;
         let { width, height } = img;
         if (width > maxDim || height > maxDim) {
           if (width > height) {
@@ -131,25 +133,23 @@ export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScan
             width = Math.round((width * maxDim) / height);
             height = maxDim;
           }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const optimized = canvas.toDataURL('image/jpeg', 0.92);
-            setImagePreview(optimized);
-            setImageBase64(optimized);
-            setMimeType('image/jpeg');
-            return;
-          }
         }
-        setImagePreview(dataUrl);
-        setImageBase64(dataUrl);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          setError('No se pudo preparar la imagen. Prueba con una captura JPG o PNG.');
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const optimized = canvas.toDataURL('image/jpeg', 0.82);
+        setImagePreview(optimized);
+        setImageBase64(optimized);
+        setMimeType('image/jpeg');
       };
       img.onerror = () => {
-        setImagePreview(dataUrl);
-        setImageBase64(dataUrl);
+        setError('No se pudo abrir esta imagen. Prueba con una captura JPG o PNG.');
       };
       img.src = dataUrl;
     };
@@ -193,10 +193,15 @@ export function ImageScheduleScannerModal({ isOpen, onClose }: ImageScheduleScan
     setError(null);
 
     try {
+      if (!currentUser || currentUser.uid === 'local_user') {
+        throw new Error('Inicia sesión con uno de los dos correos autorizados para analizar fotos.');
+      }
+      const idToken = await currentUser.getIdToken();
       const response = await fetch('/api/ai/parse-schedule-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify({
           imageBase64,

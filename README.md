@@ -41,7 +41,9 @@ Aplicación de calendario privada y segura desarrollada por **Jorge Sevilla** co
    npm install
    ```
 
-3. **Configurar las claves**: copia `.env.example` a `.env` y completa `GEMINI_API_KEY` y las variables públicas de Firebase. La clave de Gemini solo se usa desde el servidor.
+3. **Configurar Gemini**: copia `.env.example` a `.env` para desarrollo local y completa `GEMINI_API_KEY`. La configuración pública de Firebase está en `firebase-applet-config.json`; la clave de Gemini solo se usa desde el servidor.
+
+   En Netlify, añade `GEMINI_API_KEY` y `AI_ALLOWED_EMAILS` en la configuración del sitio. `AI_ALLOWED_EMAILS` debe contener los dos correos autorizados separados por una coma. La función valida la sesión de Firebase y solo permite esos correos.
 
 4. **Iniciar el servidor de desarrollo**:
    ```bash
