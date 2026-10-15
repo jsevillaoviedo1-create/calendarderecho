@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Sparkles,
   Tag,
+  BookOpen,
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -24,9 +25,18 @@ interface NavbarProps {
   onOpenICS: () => void;
   onOpenBiometrics: () => void;
   onOpenCategories?: () => void;
+  activeTab?: 'calendar' | 'agenda';
+  onSelectTab?: (tab: 'calendar' | 'agenda') => void;
 }
 
-export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics, onOpenCategories }: NavbarProps) {
+export function Navbar({
+  onOpenNewEvent,
+  onOpenICS,
+  onOpenBiometrics,
+  onOpenCategories,
+  activeTab = 'calendar',
+  onSelectTab,
+}: NavbarProps) {
   const { currentUser, userProfile, logout, lockSession, isBiometricEnrolled } = useAuth();
   const { searchQuery, setSearchQuery } = useCalendar();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -50,8 +60,36 @@ export function Navbar({ onOpenNewEvent, onOpenICS, onOpenBiometrics, onOpenCate
           </div>
         </div>
 
+        {/* Navigation Tabs Switcher (Calendario vs Agenda) */}
+        {onSelectTab && (
+          <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs shadow-inner">
+            <button
+              onClick={() => onSelectTab('calendar')}
+              className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'calendar'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <CalendarIcon className="w-3.5 h-3.5" />
+              <span>Calendario</span>
+            </button>
+            <button
+              onClick={() => onSelectTab('agenda')}
+              className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'agenda'
+                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Agenda</span>
+            </button>
+          </div>
+        )}
+
         {/* Search Bar */}
-        <div className="flex-1 max-w-md relative hidden md:block">
+        <div className="flex-1 max-w-sm relative hidden lg:block">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"

@@ -81,6 +81,23 @@ service cloud.firestore {
         data.createdAt is string && data.createdAt.size() <= 50;
     }
 
+    function isValidAgendaTask(data, userId) {
+      return data.keys().hasAll(['title', 'date', 'userId', 'completed', 'createdAt']) &&
+        data.keys().hasOnly(['title', 'date', 'userId', 'completed', 'createdAt', 'description', 'time', 'semester', 'subject', 'completedAt', 'priority', 'updatedAt']) &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.date is string && data.date.size() >= 1 && data.date.size() <= 50 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.completed is bool &&
+        data.createdAt is string && data.createdAt.size() <= 50 &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+        (!('time' in data) || (data.time is string && data.time.size() <= 50)) &&
+        (!('semester' in data) || (data.semester is string && data.semester.size() <= 50)) &&
+        (!('subject' in data) || (data.subject is string && data.subject.size() <= 100)) &&
+        (!('completedAt' in data) || (data.completedAt is string && data.completedAt.size() <= 50)) &&
+        (!('priority' in data) || (data.priority is string && data.priority.size() <= 50)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
     // Diagnostics / health check
     match /test/{testId} {
       allow get: if true;
@@ -126,6 +143,17 @@ service cloud.firestore {
                       isValidCustomCategory(incoming(), userId) &&
                       incoming().userId == existing().userId;
         allow delete: if isOwner(userId) && isValidId(userId) && isValidId(categoryId);
+      }
+
+      // User Agenda tasks (asignaturas, semestre, dia a dia)
+      match /agenda_tasks/{taskId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(taskId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(taskId) && isValidAgendaTask(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(taskId) &&
+                      isValidAgendaTask(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(taskId);
       }
     }
   }

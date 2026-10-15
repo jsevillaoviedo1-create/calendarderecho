@@ -244,7 +244,7 @@ export function CalendarView({ onSelectDate, onSelectEvent, onOpenCategoryManage
               onClick={() => handleChangeView('listWeek')}
               className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             >
-              Agenda
+              Vertical
             </button>
           </div>
         </div>
@@ -255,6 +255,7 @@ export function CalendarView({ onSelectDate, onSelectEvent, onOpenCategoryManage
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
             initialView="dayGridMonth"
+            firstDay={1}
             headerToolbar={{
               left: 'title',
               center: '',
@@ -277,7 +278,7 @@ export function CalendarView({ onSelectDate, onSelectEvent, onOpenCategoryManage
               month: 'Mes',
               week: 'Semana',
               day: 'Día',
-              list: 'Agenda',
+              list: 'Vertical',
             }}
             nowIndicator={true}
           />

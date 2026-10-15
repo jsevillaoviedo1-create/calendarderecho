@@ -25,6 +25,8 @@ interface AuthContextType {
   isSessionLocked: boolean;
   isBiometricSupported: boolean;
   isBiometricEnrolled: boolean;
+  isLocalMode: boolean;
+  continueAsLocalUser: () => void;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, name: string) => Promise<void>;
@@ -43,6 +45,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isLocalMode, setIsLocalMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('derecho_local_mode') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [isSessionLocked, setIsSessionLocked] = useState<boolean>(false);
   const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
@@ -105,6 +114,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const continueAsLocalUser = () => {
+    setIsLocalMode(true);
+    try {
+      localStorage.setItem('derecho_local_mode', 'true');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const loginWithGoogle = async () => {
     setLoading(true);
     try {
@@ -147,6 +165,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    setIsLocalMode(false);
+    try {
+      localStorage.removeItem('derecho_local_mode');
+    } catch (e) {
+      console.error(e);
+    }
     if (currentUser) {
       sessionStorage.removeItem(`chronos_locked_${currentUser.uid}`);
     }
@@ -269,15 +293,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isBiometricEnrolled = Boolean(userProfile?.biometricEnabled && userProfile.biometricCredentialId);
 
+  // If in local mode and not logged in to Firebase, synthesize a local offline user
+  const effectiveUser = currentUser || (isLocalMode ? ({
+    uid: 'local_user',
+    email: 'jorge.sevilla@derechopro.local',
+    displayName: 'Jorge Sevilla',
+  } as unknown as User) : null);
+
+  const effectiveProfile: UserProfile | null = userProfile || (isLocalMode ? {
+    email: 'jorge.sevilla@derechopro.local',
+    displayName: 'Jorge Sevilla',
+    createdAt: new Date().toISOString(),
+  } : null);
+
   return (
     <AuthContext.Provider
       value={{
-        currentUser,
-        userProfile,
+        currentUser: effectiveUser,
+        userProfile: effectiveProfile,
         loading,
         isSessionLocked,
         isBiometricSupported,
         isBiometricEnrolled,
+        isLocalMode,
+        continueAsLocalUser,
         loginWithGoogle,
         loginWithEmail,
         registerWithEmail,

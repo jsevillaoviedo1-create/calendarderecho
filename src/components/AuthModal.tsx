@@ -8,7 +8,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen }: AuthModalProps) {
-  const { loginWithGoogle, loginWithEmail, registerWithEmail, resetPassword } = useAuth();
+  const { loginWithGoogle, loginWithEmail, registerWithEmail, resetPassword, continueAsLocalUser } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [email, setEmail] = useState('');
@@ -280,8 +280,23 @@ export function AuthModal({ isOpen }: AuthModalProps) {
           )}
         </div>
 
+        {/* Local Mode Direct Entry */}
+        <div className="mt-4 pt-3 border-t border-slate-800/60 text-center">
+          <button
+            type="button"
+            onClick={continueAsLocalUser}
+            className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98"
+          >
+            <Shield className="w-4 h-4 text-emerald-400" />
+            <span>Acceder en modo local privado (sin nube)</span>
+          </button>
+          <p className="text-[10px] text-slate-500 mt-1">
+            Recomendado para uso en local o si estás desplegado en Netlify sin configurar dominios en Firebase.
+          </p>
+        </div>
+
         {/* Security badge footer */}
-        <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-center gap-2 text-slate-500 text-[11px]">
+        <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-center gap-2 text-slate-500 text-[11px]">
           <Shield className="w-3.5 h-3.5 text-emerald-400" />
           <span>informacion guardada en local no se sube informacion a la nube</span>
         </div>

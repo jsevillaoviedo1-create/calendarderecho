@@ -6,9 +6,11 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CalendarProvider } from './context/CalendarContext';
+import { AgendaProvider } from './context/AgendaContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { Navbar } from './components/Navbar';
 import { CalendarView } from './components/CalendarView';
+import { AgendaView } from './components/AgendaView';
 import { EventModal } from './components/EventModal';
 import { ICSImportModal } from './components/ICSImportModal';
 import { BiometricLockModal } from './components/BiometricLockModal';
@@ -25,10 +27,14 @@ import {
   ArrowRight,
   Database,
   Lock,
+  BookOpen,
 } from 'lucide-react';
 
 function CalendarApp() {
   const { currentUser, loading, isBiometricEnrolled, isBiometricSupported } = useAuth();
+
+  // Tab state: 'calendar' | 'agenda'
+  const [activeTab, setActiveTab] = useState<'calendar' | 'agenda'>('calendar');
 
   // Modals state
   const [eventModalOpen, setEventModalOpen] = useState(false);
@@ -85,6 +91,8 @@ function CalendarApp() {
         onOpenICS={() => setIcsModalOpen(true)}
         onOpenBiometrics={() => setBiometricsModalOpen(true)}
         onOpenCategories={() => setCategoryModalOpen(true)}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
       />
 
       {/* Main Content Area */}
@@ -130,12 +138,53 @@ function CalendarApp() {
               </div>
             )}
 
-            {/* Calendar View Component */}
-            <CalendarView
-              onSelectDate={handleSelectDate}
-              onSelectEvent={handleSelectEvent}
-              onOpenCategoryManager={() => setCategoryModalOpen(true)}
-            />
+            {/* View Switcher Bar (Calendario vs Agenda) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5 bg-slate-900/60 border border-slate-800 p-2 sm:p-2.5 rounded-2xl">
+              <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800/80">
+                <button
+                  onClick={() => setActiveTab('calendar')}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer flex-1 sm:flex-none ${
+                    activeTab === 'calendar'
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <CalendarIcon className="w-4 h-4" />
+                  <span>Calendario</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('agenda')}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer flex-1 sm:flex-none ${
+                    activeTab === 'agenda'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>Agenda (Día a Día)</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-slate-400 px-2">
+                <span className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Semanas Lun - Dom</span>
+                </span>
+                <span className="text-slate-600 hidden sm:inline">•</span>
+                <span className="text-[11px] text-slate-400 hidden sm:inline">1er y 2o Semestre</span>
+              </div>
+            </div>
+
+            {/* Active Tab Component */}
+            {activeTab === 'calendar' ? (
+              <CalendarView
+                onSelectDate={handleSelectDate}
+                onSelectEvent={handleSelectEvent}
+                onOpenCategoryManager={() => setCategoryModalOpen(true)}
+              />
+            ) : (
+              <AgendaView />
+            )}
           </>
         ) : (
           /* Welcome Hero for Unauthenticated User */
@@ -230,9 +279,11 @@ export default function App() {
   return (
     <AuthProvider>
       <CalendarProvider>
-        <NotificationProvider>
-          <CalendarApp />
-        </NotificationProvider>
+        <AgendaProvider>
+          <NotificationProvider>
+            <CalendarApp />
+          </NotificationProvider>
+        </AgendaProvider>
       </CalendarProvider>
     </AuthProvider>
   );

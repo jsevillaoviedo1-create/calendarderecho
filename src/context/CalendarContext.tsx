@@ -28,6 +28,7 @@ interface CalendarContextType {
   customCategories: CustomCategoryItem[];
   allCategories: CategoryOption[];
   createCustomCategory: (name: string, color: string) => Promise<string>;
+  updateCustomCategory: (id: string, name: string, color: string) => Promise<void>;
   deleteCustomCategory: (id: string) => Promise<void>;
   createEvent: (data: Omit<CalendarEventItem, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateEvent: (id: string, updates: Partial<CalendarEventItem>) => Promise<void>;
@@ -50,6 +51,17 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!currentUser) {
       setEvents([]);
+      setLoading(false);
+      return;
+    }
+
+    if (currentUser.uid === 'local_user') {
+      try {
+        const saved = localStorage.getItem('derecho_local_events');
+        setEvents(saved ? JSON.parse(saved) : []);
+      } catch {
+        setEvents([]);
+      }
       setLoading(false);
       return;
     }
@@ -109,16 +121,55 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [currentUser]);
 
-  // Combined categories list (default preset categories + user custom categories)
+  // Track deleted and edited categories locally so any category (including initial ones) can be modified or deleted
+  const [deletedCategoryIds, setDeletedCategoryIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('derecho_deleted_categories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [editedCategories, setEditedCategories] = useState<Record<string, { name: string; color: string }>>(() => {
+    try {
+      const saved = localStorage.getItem('derecho_edited_categories');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Combined categories list (initial categories + user custom categories, applying edits and deletions)
   const allCategories = useMemo(() => {
-    const customs: CategoryOption[] = customCategories.map((c) => ({
-      id: c.id,
-      name: c.name,
-      color: c.color,
-      isCustom: true,
-    }));
-    return [...DEFAULT_CATEGORIES, ...customs];
-  }, [customCategories]);
+    // 1. Initial categories with edits and deleted filter applied
+    const defaults: CategoryOption[] = DEFAULT_CATEGORIES
+      .filter((c) => !deletedCategoryIds.includes(c.id))
+      .map((c) => {
+        const edited = editedCategories[c.id];
+        return {
+          id: c.id,
+          name: edited ? edited.name : c.name,
+          color: edited ? edited.color : c.color,
+          isCustom: true, // Mark all as editable & deletable as requested by user
+        };
+      });
+
+    // 2. Custom categories from Firestore or local
+    const customs: CategoryOption[] = customCategories
+      .filter((c) => !deletedCategoryIds.includes(c.id))
+      .map((c) => {
+        const edited = editedCategories[c.id];
+        return {
+          id: c.id,
+          name: edited ? edited.name : c.name,
+          color: edited ? edited.color : c.color,
+          isCustom: true,
+        };
+      });
+
+    return [...defaults, ...customs];
+  }, [customCategories, deletedCategoryIds, editedCategories]);
 
   // Clean and sanitize string helpers
   const sanitize = (str: string | undefined, max: number) => {
@@ -127,38 +178,102 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   };
 
   const createCustomCategory = async (name: string, color: string): Promise<string> => {
-    if (!currentUser) throw new Error('No estás autenticado.');
-
     const catId = 'cat_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
-    const catPath = `users/${currentUser.uid}/categories/${catId}`;
     const nowISO = new Date().toISOString();
+    const cleanName = name.trim().slice(0, 50);
+    const cleanColor = color.trim().slice(0, 32) || '#6366f1';
 
-    const payload: CustomCategoryItem = {
-      id: catId,
-      name: name.trim().slice(0, 50),
-      color: color.trim().slice(0, 32) || '#6366f1',
-      userId: currentUser.uid,
-      createdAt: nowISO,
-    };
+    if (currentUser) {
+      const catPath = `users/${currentUser.uid}/categories/${catId}`;
+      const payload: CustomCategoryItem = {
+        id: catId,
+        name: cleanName,
+        color: cleanColor,
+        userId: currentUser.uid,
+        createdAt: nowISO,
+      };
 
-    try {
-      const docRef = doc(db, 'users', currentUser.uid, 'categories', catId);
-      await setDoc(docRef, payload);
-      return catId;
-    } catch (error) {
-      handleFirestoreError(error, OperationType.CREATE, catPath);
+      try {
+        const docRef = doc(db, 'users', currentUser.uid, 'categories', catId);
+        await setDoc(docRef, payload);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.CREATE, catPath);
+      }
+    } else {
+      // Local fallback
+      setCustomCategories((prev) => [
+        ...prev,
+        { id: catId, name: cleanName, color: cleanColor, userId: 'local', createdAt: nowISO },
+      ]);
+    }
+    return catId;
+  };
+
+  const updateCustomCategory = async (id: string, name: string, color: string): Promise<void> => {
+    const trimmedName = name.trim().slice(0, 50);
+    const trimmedColor = color.trim().slice(0, 32) || '#6366f1';
+
+    // Update in editedCategories (persisted in localStorage)
+    setEditedCategories((prev) => {
+      const next = { ...prev, [id]: { name: trimmedName, color: trimmedColor } };
+      try {
+        localStorage.setItem('derecho_edited_categories', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
+
+    // Also update customCategories in state if present
+    setCustomCategories((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, name: trimmedName, color: trimmedColor } : c))
+    );
+
+    // If exists in Firestore, update doc
+    if (currentUser && customCategories.some((c) => c.id === id)) {
+      const catPath = `users/${currentUser.uid}/categories/${id}`;
+      try {
+        const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
+        await updateDoc(docRef, {
+          name: trimmedName,
+          color: trimmedColor,
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.UPDATE, catPath);
+      }
     }
   };
 
   const deleteCustomCategory = async (id: string): Promise<void> => {
-    if (!currentUser) throw new Error('No estás autenticado.');
+    // Mark as deleted in deletedCategoryIds
+    setDeletedCategoryIds((prev) => {
+      const next = Array.from(new Set([...prev, id]));
+      try {
+        localStorage.setItem('derecho_deleted_categories', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
 
-    const catPath = `users/${currentUser.uid}/categories/${id}`;
-    try {
-      const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
-      await deleteDoc(docRef);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.DELETE, catPath);
+    // Remove from customCategories state
+    setCustomCategories((prev) => prev.filter((c) => c.id !== id));
+
+    // If selectedCategory matches deleted category name, reset
+    const target = allCategories.find((c) => c.id === id);
+    if (target && selectedCategory === target.name) {
+      setSelectedCategory('all');
+    }
+
+    // If stored in Firestore, delete doc
+    if (currentUser && customCategories.some((c) => c.id === id)) {
+      const catPath = `users/${currentUser.uid}/categories/${id}`;
+      try {
+        const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
+        await deleteDoc(docRef);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, catPath);
+      }
     }
   };
 
@@ -168,7 +283,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (!currentUser) throw new Error('No estás autenticado.');
 
     const eventId = 'evt_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
-    const eventPath = `users/${currentUser.uid}/events/${eventId}`;
     const nowISO = new Date().toISOString();
 
     const payload: CalendarEventItem = {
@@ -187,6 +301,20 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (data.color) payload.color = sanitize(data.color, 32);
     if (data.category) payload.category = sanitize(data.category, 50);
 
+    if (currentUser.uid === 'local_user') {
+      setEvents((prev) => {
+        const next = [...prev, payload];
+        try {
+          localStorage.setItem('derecho_local_events', JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+        return next;
+      });
+      return eventId;
+    }
+
+    const eventPath = `users/${currentUser.uid}/events/${eventId}`;
     try {
       const docRef = doc(db, 'users', currentUser.uid, 'events', eventId);
       await setDoc(docRef, payload);
@@ -199,7 +327,6 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   const updateEvent = async (id: string, updates: Partial<CalendarEventItem>): Promise<void> => {
     if (!currentUser) throw new Error('No estás autenticado.');
 
-    const eventPath = `users/${currentUser.uid}/events/${id}`;
     const cleanUpdates: Record<string, any> = {
       updatedAt: new Date().toISOString(),
     };
@@ -213,6 +340,20 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (updates.color !== undefined) cleanUpdates.color = sanitize(updates.color, 32);
     if (updates.category !== undefined) cleanUpdates.category = sanitize(updates.category, 50);
 
+    if (currentUser.uid === 'local_user') {
+      setEvents((prev) => {
+        const next = prev.map((ev) => (ev.id === id ? { ...ev, ...cleanUpdates } : ev));
+        try {
+          localStorage.setItem('derecho_local_events', JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+        return next;
+      });
+      return;
+    }
+
+    const eventPath = `users/${currentUser.uid}/events/${id}`;
     try {
       const docRef = doc(db, 'users', currentUser.uid, 'events', id);
       await updateDoc(docRef, cleanUpdates);
@@ -223,6 +364,19 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
   const deleteEvent = async (id: string): Promise<void> => {
     if (!currentUser) throw new Error('No estás autenticado.');
+
+    if (currentUser.uid === 'local_user') {
+      setEvents((prev) => {
+        const next = prev.filter((ev) => ev.id !== id);
+        try {
+          localStorage.setItem('derecho_local_events', JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+        return next;
+      });
+      return;
+    }
 
     const eventPath = `users/${currentUser.uid}/events/${id}`;
     try {
@@ -325,6 +479,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
         customCategories,
         allCategories,
         createCustomCategory,
+        updateCustomCategory,
         deleteCustomCategory,
         createEvent,
         updateEvent,

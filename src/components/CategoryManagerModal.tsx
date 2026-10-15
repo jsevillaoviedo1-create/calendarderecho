@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCalendar } from '../context/CalendarContext';
-import { Tag, Plus, Trash2, X, Check, Palette } from 'lucide-react';
+import { Tag, Plus, Trash2, X, Check, Pencil, Palette } from 'lucide-react';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -8,27 +8,32 @@ interface CategoryManagerModalProps {
 }
 
 const PRESET_COLORS = [
-  '#6366f1', // Indigo
-  '#8b5cf6', // Violet
-  '#ec4899', // Pink
-  '#ef4444', // Red
-  '#f97316', // Orange
-  '#f59e0b', // Amber
-  '#10b981', // Emerald
-  '#06b6d4', // Cyan
   '#3b82f6', // Blue
-  '#14b8a6', // Teal
+  '#8b5cf6', // Violet
+  '#10b981', // Emerald
+  '#f97316', // Orange
+  '#ec4899', // Pink
+  '#06b6d4', // Cyan
+  '#ef4444', // Red
   '#a855f7', // Purple
+  '#e11d48', // Rose / Examen final
+  '#6366f1', // Indigo
+  '#f59e0b', // Amber
   '#64748b', // Slate
 ];
 
 export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalProps) {
-  const { allCategories, createCustomCategory, deleteCustomCategory } = useCalendar();
+  const { allCategories, createCustomCategory, updateCustomCategory, deleteCustomCategory } = useCalendar();
 
   const [name, setName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#6366f1');
+  const [selectedColor, setSelectedColor] = useState('#8b5cf6');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Editing category state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editColor, setEditColor] = useState('#8b5cf6');
 
   if (!isOpen) return null;
 
@@ -60,10 +65,45 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
     }
   };
 
+  const handleStartEdit = (cat: { id: string; name: string; color: string }) => {
+    setEditingId(cat.id);
+    setEditName(cat.name);
+    setEditColor(cat.color);
+    setError(null);
+  };
+
+  const handleSaveEdit = async (id: string) => {
+    if (!editName.trim()) {
+      setError('El nombre no puede estar vacío.');
+      return;
+    }
+
+    // Duplicate check with other categories
+    const exists = allCategories.some(
+      (c) => c.id !== id && c.name.toLowerCase() === editName.trim().toLowerCase()
+    );
+    if (exists) {
+      setError('Ya existe otra categoría con este nombre.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      await updateCustomCategory(id, editName.trim(), editColor);
+      setEditingId(null);
+    } catch (err: any) {
+      setError(err.message || 'Error actualizando categoría.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async (id: string, catName: string) => {
     if (!confirm(`¿Eliminar la categoría "${catName}"?`)) return;
     try {
       await deleteCustomCategory(id);
+      if (editingId === id) setEditingId(null);
     } catch (err: any) {
       setError(err.message || 'Error eliminando categoría.');
     }
@@ -71,7 +111,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -88,7 +128,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
           <div>
             <h3 className="text-lg font-bold text-white">Gestionar Categorías</h3>
             <p className="text-xs text-slate-400">
-              Personaliza las etiquetas y colores para organizar tus citas y expedientes.
+              Todas las categorías son completamente editables y eliminables.
             </p>
           </div>
         </div>
@@ -111,7 +151,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
             <input
               type="text"
               required
-              placeholder="Ej. Audiencias, Clientes VIP, Tribunales, Contratos..."
+              placeholder="Ej. Tareas Derecho, Seminarios, Prácticas..."
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -174,44 +214,116 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
 
         {/* Existing categories list */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Categorías disponibles ({allCategories.length})
-          </h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Categorías activas ({allCategories.length})
+            </h4>
+            <span className="text-[11px] text-slate-500">Editables y eliminables</span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {allCategories.map((cat) => (
-              <div
-                key={cat.id}
-                className="p-2.5 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-2"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <div
-                    className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <span className="text-xs font-medium text-white truncate">{cat.name}</span>
-                  {cat.isCustom ? (
-                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                      Personalizada
-                    </span>
-                  ) : (
-                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400">
-                      Predefinida
-                    </span>
-                  )}
-                </div>
+            {allCategories.map((cat) => {
+              const isEditing = editingId === cat.id;
 
-                {cat.isCustom && (
-                  <button
-                    onClick={() => handleDelete(cat.id, cat.name)}
-                    title="Eliminar categoría personalizada"
-                    className="p-1 text-slate-500 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
+              if (isEditing) {
+                return (
+                  <div
+                    key={cat.id}
+                    className="p-3 rounded-xl bg-slate-950 border border-indigo-500/50 shadow-md col-span-1 sm:col-span-2 space-y-2.5 animate-in fade-in"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            ))}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Editar Categoría</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setEditingId(null)}
+                        className="text-slate-400 hover:text-white text-xs p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="Nombre de la categoría"
+                        className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={editColor}
+                          onChange={(e) => setEditColor(e.target.value)}
+                          className="w-7 h-7 rounded cursor-pointer border-0 bg-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEdit(cat.id)}
+                          disabled={loading || !editName.trim()}
+                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Guardar</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {PRESET_COLORS.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setEditColor(c)}
+                          className={`w-5 h-5 rounded-md transition-transform cursor-pointer ${
+                            editColor === c ? 'scale-110 ring-2 ring-white' : 'hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={cat.id}
+                  className="p-2.5 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-2 hover:border-slate-700/80 transition-colors group"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: cat.color }}
+                    />
+                    <span className="text-xs font-medium text-white truncate">{cat.name}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    {/* Edit button */}
+                    <button
+                      onClick={() => handleStartEdit(cat)}
+                      title="Editar nombre y color"
+                      className="p-1 text-slate-400 hover:text-indigo-300 rounded-lg hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Delete button */}
+                    <button
+                      onClick={() => handleDelete(cat.id, cat.name)}
+                      title="Eliminar categoría"
+                      className="p-1 text-slate-400 hover:text-red-400 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
