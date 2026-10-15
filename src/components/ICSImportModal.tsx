@@ -167,7 +167,7 @@ END:VCALENDAR`;
 
         {/* Modal Title */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+          <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400">
             <UploadCloud className="w-6 h-6" />
           </div>
           <div>
@@ -210,7 +210,7 @@ END:VCALENDAR`;
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
             isDragging
-              ? 'border-indigo-500 bg-indigo-500/10'
+              ? 'border-amber-500 bg-amber-500/10'
               : 'border-slate-800 hover:border-slate-700 bg-slate-950/40 hover:bg-slate-950/60'
           }`}
         >
@@ -221,11 +221,11 @@ END:VCALENDAR`;
             onChange={handleFileChange}
             className="hidden"
           />
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-3">
             <FileText className="w-6 h-6" />
           </div>
           <p className="text-sm font-semibold text-white">
-            Arrastra tu archivo <span className="text-indigo-400">.ics</span> aquí
+            Arrastra tu archivo <span className="text-amber-400">.ics</span> aquí
           </p>
           <p className="text-xs text-slate-400 mt-1">O haz clic para explorar en tu equipo</p>
 
@@ -236,7 +236,7 @@ END:VCALENDAR`;
                 e.stopPropagation();
                 loadSampleICS();
               }}
-              className="text-[11px] font-medium text-indigo-400 hover:text-indigo-300 px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 transition-colors flex items-center gap-1"
+              className="text-[11px] font-medium text-amber-400 hover:text-amber-300 px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-colors flex items-center gap-1"
             >
               <Sparkles className="w-3 h-3" />
               <span>Cargar ejemplo rápido (.ics)</span>
@@ -249,9 +249,9 @@ END:VCALENDAR`;
           <div className="mt-4 flex-1 overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-slate-300">
-                Eventos detectados en <span className="text-indigo-400 font-mono">{fileName}</span>:
+                Eventos detectados en <span className="text-amber-400 font-mono">{fileName}</span>:
               </span>
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300">
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300">
                 {parsedEvents.length} eventos
               </span>
             </div>
@@ -284,7 +284,7 @@ END:VCALENDAR`;
               <button
                 onClick={handleImport}
                 disabled={importing}
-                className="w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                className="w-full py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-lg shadow-amber-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>

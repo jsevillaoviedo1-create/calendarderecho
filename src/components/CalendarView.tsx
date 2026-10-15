@@ -140,7 +140,7 @@ export function CalendarView({
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer border ${
               selectedCategory === 'all'
-                ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
                 : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
           >
@@ -169,7 +169,7 @@ export function CalendarView({
             <button
               onClick={onOpenCategoryManager}
               title="Gestionar y crear categorías personalizadas"
-              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 border border-indigo-500/30"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/30"
             >
               <span>+ Categoría</span>
             </button>
@@ -179,7 +179,7 @@ export function CalendarView({
         {/* Quick stats badge */}
         <div className="flex items-center gap-3 shrink-0 text-xs text-slate-400 self-end sm:self-center">
           <div className="flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/60">
-            <Clock className="w-3.5 h-3.5 text-indigo-400" />
+            <Clock className="w-3.5 h-3.5 text-amber-400" />
             <span>Hoy: <strong className="text-white">{stats.today}</strong></span>
           </div>
           <div className="flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/60">
@@ -193,8 +193,8 @@ export function CalendarView({
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
         {loading && (
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-20">
-            <div className="flex items-center gap-2.5 text-indigo-400 text-sm font-semibold bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 shadow-lg">
-              <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center gap-2.5 text-amber-400 text-sm font-semibold bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 shadow-lg">
+              <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
               <span>Sincronizando con Firestore...</span>
             </div>
           </div>
@@ -230,9 +230,9 @@ export function CalendarView({
               <button
                 onClick={onOpenImageScanner}
                 title="Pegar o subir foto de un horario o cuadrante para añadirlo con IA"
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-500/40 text-indigo-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-500/40 text-amber-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
               >
-                <Camera className="w-3.5 h-3.5 text-indigo-400" />
+                <Camera className="w-3.5 h-3.5 text-amber-400" />
                 <span>Pegar Horario (Foto)</span>
               </button>
             )}

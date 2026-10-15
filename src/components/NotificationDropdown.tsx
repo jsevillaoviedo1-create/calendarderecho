@@ -51,7 +51,7 @@ export function NotificationDropdown() {
       >
         <Bell className="w-4 h-4 text-slate-300" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-indigo-500 text-[10px] font-bold text-white flex items-center justify-center animate-pulse shadow-sm shadow-indigo-500/50">
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-[10px] font-bold text-white flex items-center justify-center animate-pulse shadow-sm shadow-amber-500/50">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -64,7 +64,7 @@ export function NotificationDropdown() {
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-white">Notificaciones</span>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-400">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">
                   {unreadCount} nuevas
                 </span>
               )}
@@ -94,9 +94,9 @@ export function NotificationDropdown() {
 
           {/* FCM Push Banner if not enabled */}
           {!fcmEnabled && (
-            <div className="m-3 p-3 bg-gradient-to-r from-indigo-950/80 to-purple-950/60 border border-indigo-500/30 rounded-xl">
+            <div className="m-3 p-3 bg-gradient-to-r from-amber-950/80 to-purple-950/60 border border-amber-500/30 rounded-xl">
               <div className="flex items-start gap-2.5">
-                <Bell className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                <Bell className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-white">Notificaciones Push (FCM)</p>
                   <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
@@ -106,7 +106,7 @@ export function NotificationDropdown() {
                   <button
                     onClick={handleEnableFCM}
                     disabled={enabling}
-                    className="mt-2 text-xs font-medium px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition-all cursor-pointer disabled:opacity-60"
+                    className="mt-2 text-xs font-medium px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-500 text-white shadow-sm transition-all cursor-pointer disabled:opacity-60"
                   >
                     {enabling ? 'Activando...' : 'Permitir Notificaciones'}
                   </button>
@@ -138,7 +138,7 @@ export function NotificationDropdown() {
                     <div className="flex items-start gap-2 min-w-0">
                       <div
                         className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                          n.read ? 'bg-transparent' : 'bg-indigo-400'
+                          n.read ? 'bg-transparent' : 'bg-amber-400'
                         }`}
                       />
                       <div className="min-w-0">
@@ -160,7 +160,7 @@ export function NotificationDropdown() {
                           markAsRead(n.id);
                         }}
                         title="Marcar como leída"
-                        className="text-slate-500 hover:text-indigo-400 p-1"
+                        className="text-slate-500 hover:text-amber-400 p-1"
                       >
                         <Check className="w-3 h-3" />
                       </button>

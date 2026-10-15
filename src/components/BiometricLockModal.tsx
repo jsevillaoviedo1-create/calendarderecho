@@ -58,12 +58,12 @@ export function BiometricLockModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 text-center relative">
         {/* Glow effect */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-indigo-500/10 blur-2xl pointer-events-none rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-amber-500/10 blur-2xl pointer-events-none rounded-full" />
 
         {/* Biometric Icon */}
         <div className="relative mx-auto w-20 h-20 mb-5">
-          <div className="absolute inset-0 rounded-full bg-indigo-500/20 animate-ping opacity-50" />
-          <div className="relative w-full h-full rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 text-white">
+          <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping opacity-50" />
+          <div className="relative w-full h-full rounded-full bg-gradient-to-tr from-amber-600 to-yellow-600 flex items-center justify-center shadow-xl shadow-amber-500/20 text-white">
             <Fingerprint className="w-10 h-10 animate-pulse" />
           </div>
           <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-amber-400">
@@ -73,7 +73,7 @@ export function BiometricLockModal() {
 
         <h2 className="text-xl font-bold text-white tracking-tight">Sesión Bloqueada</h2>
         <p className="text-sm text-slate-400 mt-1 mb-6">
-          Hola, <span className="text-indigo-300 font-medium">{userProfile?.displayName || currentUser?.email}</span>.
+          Hola, <span className="text-amber-300 font-medium">{userProfile?.displayName || currentUser?.email}</span>.
           Tu sesión está protegida con seguridad biométrica local WebAuthn.
         </p>
 
@@ -89,7 +89,7 @@ export function BiometricLockModal() {
             <button
               onClick={handleBiometricUnlock}
               disabled={loading}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
+              className="w-full py-3.5 px-4 rounded-xl font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-lg shadow-amber-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
             >
               <Fingerprint className="w-5 h-5" />
               <span>{loading ? 'Verificando...' : 'Desbloquear con Biometría'}</span>
@@ -121,7 +121,7 @@ export function BiometricLockModal() {
                   placeholder="Tu contraseña de Calendario Derecho Pro"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -130,7 +130,7 @@ export function BiometricLockModal() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-500 text-white shadow-md active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl font-medium bg-amber-600 hover:bg-amber-500 text-white shadow-md active:scale-[0.99] transition-all disabled:opacity-60 cursor-pointer"
               >
                 {loading ? 'Verificando...' : 'Desbloquear Sesión'}
               </button>
@@ -141,7 +141,7 @@ export function BiometricLockModal() {
                   setUsePasswordFallback(false);
                   setError(null);
                 }}
-                className="w-full py-2 px-3 text-xs text-slate-400 hover:text-indigo-300 transition-colors"
+                className="w-full py-2 px-3 text-xs text-slate-400 hover:text-amber-300 transition-colors"
               >
                 ← Volver al desbloqueo biométrico
               </button>

@@ -1,19 +1,9 @@
-# Netlify serves the Vite frontend and bundles the image-to-calendar API function.
+# Netlify build and routing configuration
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions"
 
-[functions]
-  node_bundler = "esbuild"
-
-# Route the AI API before the catch-all SPA route.
-[[redirects]]
-  from = "/api/ai/parse-schedule-image"
-  to = "/.netlify/functions/parse-schedule-image"
-  status = 200
-  force = true
-
+# SPA redirect rule
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -355,7 +355,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                 placeholder="Ej. Derecho Romano, Clase de cálculo, Examen Parcial..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl px-4 py-2.5 text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all font-medium"
               />
             </div>
 
@@ -363,7 +363,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-indigo-400" />
+                  <Tag className="w-3.5 h-3.5 text-amber-400" />
                   <span>Categoría</span>
                 </label>
 
@@ -373,8 +373,8 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     onClick={() => setShowNewCatInput(!showNewCatInput)}
                     className={`text-xs font-semibold px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1 cursor-pointer ${
                       showNewCatInput
-                        ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
-                        : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                        ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
+                        : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
                     }`}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -404,7 +404,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     onClick={() => handleCategorySelect(cat.name, cat.color)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 border cursor-pointer ${
                       category === cat.name
-                        ? 'bg-slate-800 text-white border-indigo-400/80 ring-2 ring-indigo-500/20 shadow-sm'
+                        ? 'bg-slate-800 text-white border-amber-400/80 ring-2 ring-amber-500/20 shadow-sm'
                         : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200 hover:bg-slate-800/40'
                     }`}
                   >
@@ -414,7 +414,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     />
                     <span>{cat.name}</span>
                     {cat.isCustom && (
-                      <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                      <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
                         propia
                       </span>
                     )}
@@ -426,8 +426,8 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                   onClick={() => setShowNewCatInput(!showNewCatInput)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer border ${
                     showNewCatInput
-                      ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
-                      : 'text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-500/30 border-dashed'
+                      ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
+                      : 'text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 border-dashed'
                   }`}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -437,10 +437,10 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
 
               {/* Inline new category form */}
               {showNewCatInput && (
-                <div className="mt-3 p-3.5 rounded-2xl bg-slate-950/90 border border-indigo-500/30 space-y-3 shadow-xl animate-in fade-in duration-150">
+                <div className="mt-3 p-3.5 rounded-2xl bg-slate-950/90 border border-amber-500/30 space-y-3 shadow-xl animate-in fade-in duration-150">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                       <span>Crear categoría propia</span>
                     </span>
                     <button
@@ -462,7 +462,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                       placeholder="Ej. Audiencias, Clientes VIP, Expedientes, Juicios..."
                       value={newCatName}
                       onChange={(e) => setNewCatName(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
 
@@ -521,7 +521,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                         type="button"
                         onClick={handleSaveInlineCategory}
                         disabled={!newCatName.trim() || creatingCat}
-                        className="px-3.5 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                        className="px-3.5 py-1.5 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
                       >
                         <Check className="w-3.5 h-3.5" />
                         <span>{creatingCat ? 'Guardando...' : 'Crear y Asignar'}</span>
@@ -536,7 +536,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
             <div className="p-3.5 rounded-2xl bg-slate-950/40 border border-slate-800/80 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-indigo-400" />
+                  <CalendarIcon className="w-3.5 h-3.5 text-amber-400" />
                   <span>Fechas y Horario</span>
                 </span>
 
@@ -549,7 +549,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                       onChange={(e) => setAllDay(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
                   </div>
                 </label>
               </div>
@@ -565,7 +565,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all [color-scheme:dark]"
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all [color-scheme:dark]"
                   />
                   {!allDay && (
                     <div className="mt-1.5 flex items-center gap-1.5">
@@ -574,7 +574,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                         type="time"
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 [color-scheme:dark]"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 [color-scheme:dark]"
                       />
                     </div>
                   )}
@@ -589,7 +589,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all [color-scheme:dark]"
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all [color-scheme:dark]"
                   />
                   {!allDay && (
                     <div className="mt-1.5 flex items-center gap-1.5">
@@ -598,7 +598,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                         type="time"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 [color-scheme:dark]"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 [color-scheme:dark]"
                       />
                     </div>
                   )}
@@ -617,7 +617,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                 <button
                   type="button"
                   onClick={handleOpenGoogleMaps}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                  className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-amber-500/10 transition-colors cursor-pointer"
                   title="Abrir Google Maps para buscar y copiar una ubicación"
                 >
                   <ExternalLink className="w-3 h-3" />
@@ -631,7 +631,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                   placeholder="Ej. Juzgado de 1ª Instancia nº 4, Plaza Castilla, aula 110..."
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-3 pr-24 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-3 pr-24 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 />
 
                 {/* Action buttons inside input */}
@@ -651,9 +651,9 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     onClick={handleGetGPS}
                     disabled={gpsLoading}
                     title="Obtener ubicación actual con GPS del dispositivo"
-                    className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                    className="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin text-indigo-400' : ''}`} />
+                    <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin text-amber-400' : ''}`} />
                   </button>
                 </div>
               </div>
@@ -676,7 +676,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                   disabled={gpsLoading}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition-colors cursor-pointer shadow-xs"
                 >
-                  <Navigation className={`w-3 h-3 text-indigo-400 ${gpsLoading ? 'animate-spin' : ''}`} />
+                  <Navigation className={`w-3 h-3 text-amber-400 ${gpsLoading ? 'animate-spin' : ''}`} />
                   <span>{gpsLoading ? 'Obteniendo GPS...' : 'Usar mi GPS'}</span>
                 </button>
 
@@ -713,7 +713,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                 placeholder="Detalles adicionales, temario o recordatorios..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                className="w-full bg-slate-950/60 border border-slate-800 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all resize-none"
               />
             </div>
           </div>
@@ -764,7 +764,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white rounded-xl shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 <Check className="w-4 h-4" />
                 <span>{submitting ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Añadir Evento'}</span>

@@ -96,7 +96,7 @@ export function BiometricSettingsModal({ isOpen, onClose }: BiometricSettingsMod
 
         {/* Title */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
             <Fingerprint className="w-6 h-6" />
           </div>
           <div>
@@ -129,7 +129,7 @@ export function BiometricSettingsModal({ isOpen, onClose }: BiometricSettingsMod
         <div className="p-4 bg-slate-950/60 rounded-xl border border-slate-800/80 mb-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <Cpu className="w-4 h-4 text-indigo-400" />
+              <Cpu className="w-4 h-4 text-amber-400" />
               <span className="text-xs font-semibold text-slate-300">
                 Compatibilidad de hardware WebAuthn
               </span>
@@ -175,7 +175,7 @@ export function BiometricSettingsModal({ isOpen, onClose }: BiometricSettingsMod
               <button
                 onClick={handleEnroll}
                 disabled={loading}
-                className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                className="px-4 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-500 rounded-lg shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
                 <Fingerprint className="w-4 h-4" />
                 <span>{loading ? 'Activando...' : 'Activar Biometría'}</span>
@@ -187,7 +187,7 @@ export function BiometricSettingsModal({ isOpen, onClose }: BiometricSettingsMod
             <div className="pt-2">
               <button
                 onClick={handleImmediateLock}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-amber-300 hover:text-amber-200 border border-amber-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
                 <span>Probar bloqueo de sesión ahora</span>
@@ -201,7 +201,7 @@ export function BiometricSettingsModal({ isOpen, onClose }: BiometricSettingsMod
           <span>Credencial: {userProfile?.biometricCredentialId ? 'Enrolada' : 'Ninguna'}</span>
           <button
             onClick={onClose}
-            className="text-indigo-400 hover:text-indigo-300 font-medium"
+            className="text-amber-400 hover:text-amber-300 font-medium"
           >
             Listo
           </button>

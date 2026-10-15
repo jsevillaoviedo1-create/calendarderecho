@@ -147,7 +147,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
         {/* Fixed Header */}
         <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/90 bg-slate-900/95 flex items-center justify-between shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-600 flex items-center justify-center text-white shadow-md shadow-amber-600/30 shrink-0">
               <BookOpen className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -193,14 +193,14 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
               placeholder="Ej. Resumen lección 3, Casos prácticos, Repaso sentencias..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
 
           {/* Semestre Selector (1er semestre o 2o semestre) */}
           <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 space-y-3">
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <GraduationCap className="w-4 h-4 text-indigo-400" />
+              <GraduationCap className="w-4 h-4 text-amber-400" />
               <span>Seleccionar Semestre *</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -209,7 +209,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                 onClick={() => handleSemesterChange('1er semestre')}
                 className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
                   semester === '1er semestre'
-                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-md ring-1 ring-indigo-400'
+                    ? 'bg-amber-600 text-white border-amber-500 shadow-md ring-1 ring-amber-400'
                     : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:bg-slate-800'
                 }`}
               >
@@ -220,7 +220,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                 onClick={() => handleSemesterChange('2o semestre')}
                 className={`py-2 px-3 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
                   semester === '2o semestre'
-                    ? 'bg-violet-600 text-white border-violet-500 shadow-md ring-1 ring-violet-400'
+                    ? 'bg-yellow-600 text-white border-yellow-500 shadow-md ring-1 ring-yellow-400'
                     : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:bg-slate-800'
                 }`}
               >
@@ -242,7 +242,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
             {/* Asignatura Selector according to semester */}
             <div>
               <label className="block text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
-                <Bookmark className="w-3.5 h-3.5 text-indigo-400" />
+                <Bookmark className="w-3.5 h-3.5 text-amber-400" />
                 <span>Asignatura asignada</span>
               </label>
 
@@ -255,12 +255,12 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                       onClick={() => setSubject(sub)}
                       className={`text-left p-2 rounded-lg text-xs font-medium transition-all border cursor-pointer flex items-center justify-between ${
                         subject === sub
-                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50'
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
                           : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
                       }`}
                     >
                       <span className="truncate">{sub}</span>
-                      {subject === sub && <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />}
+                      {subject === sub && <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                     </button>
                   ))}
                 </div>
@@ -275,12 +275,12 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                       onClick={() => setSubject(sub)}
                       className={`text-left p-2 rounded-lg text-xs font-medium transition-all border cursor-pointer flex items-center justify-between ${
                         subject === sub
-                          ? 'bg-violet-500/20 text-violet-300 border-violet-500/50'
+                          ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50'
                           : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
                       }`}
                     >
                       <span className="truncate">{sub}</span>
-                      {subject === sub && <CheckCircle2 className="w-3.5 h-3.5 text-violet-400 shrink-0" />}
+                      {subject === sub && <CheckCircle2 className="w-3.5 h-3.5 text-yellow-400 shrink-0" />}
                     </button>
                   ))}
                 </div>
@@ -302,7 +302,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                <CalendarIcon className="w-3.5 h-3.5 text-indigo-400" />
+                <CalendarIcon className="w-3.5 h-3.5 text-amber-400" />
                 <span>Fecha día a día *</span>
               </label>
               <input
@@ -310,7 +310,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
 
@@ -324,7 +324,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                 placeholder="Ej. 10:00 - 12:30 o Mañana"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
           </div>
@@ -337,7 +337,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
             <div className="grid grid-cols-4 gap-2">
               {[
                 { id: 'baja', label: 'Baja', color: 'border-slate-700 text-slate-400 active:bg-slate-800' },
-                { id: 'media', label: 'Normal', color: 'border-indigo-500 text-indigo-400 active:bg-indigo-950/40' },
+                { id: 'media', label: 'Normal', color: 'border-amber-500 text-amber-400 active:bg-amber-950/40' },
                 { id: 'alta', label: 'Alta', color: 'border-amber-500 text-amber-400 active:bg-amber-950/40' },
                 { id: 'urgente', label: 'Urgente', color: 'border-red-500 text-red-400 active:bg-red-950/40' },
               ].map((p) => (
@@ -347,7 +347,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                   onClick={() => setPriority(p.id as any)}
                   className={`py-1.5 px-2 rounded-xl text-xs font-medium border text-center transition-all cursor-pointer ${
                     priority === p.id
-                      ? 'bg-slate-800 text-white font-bold ring-2 ring-indigo-500'
+                      ? 'bg-slate-800 text-white font-bold ring-2 ring-amber-500'
                       : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
                   }`}
                 >
@@ -367,7 +367,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
               placeholder="Añade lo que quieras: capítulos del manual, artículos del código, jurisprudencia, dudas a preguntar..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
             />
           </div>
 
@@ -378,7 +378,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
                 type="checkbox"
                 checked={isCompleted}
                 onChange={(e) => setIsCompleted(e.target.checked)}
-                className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700"
+                className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 bg-slate-900 border-slate-700"
               />
               <span className="text-xs font-semibold text-slate-200">
                 Marcar como completada
@@ -400,7 +400,7 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
             <button
               type="submit"
               disabled={loading || !title.trim()}
-              className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white rounded-xl shadow-lg shadow-amber-500/25 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <span>Guardando...</span>

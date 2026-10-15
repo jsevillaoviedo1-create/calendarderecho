@@ -17,7 +17,7 @@ export function PWAInstallButton() {
       <button
         onClick={install}
         title="Instalar Calendario Derecho Pro como aplicación en tu PC o móvil"
-        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
       >
         <Download className="w-3.5 h-3.5" />
         <span className="hidden sm:inline">Instalar App</span>
@@ -33,7 +33,7 @@ export function PWAInstallButton() {
         <button
           onClick={() => setShowIOSGuide(true)}
           title="Instalar en iPhone / iPad"
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
         >
           <Smartphone className="w-3.5 h-3.5" />
           <span>Instalar en iOS</span>
@@ -49,7 +49,7 @@ export function PWAInstallButton() {
                 <X className="w-4 h-4" />
               </button>
 
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center mx-auto mb-3 text-white shadow-lg shadow-indigo-600/30">
+              <div className="w-12 h-12 rounded-2xl bg-amber-600 flex items-center justify-center mx-auto mb-3 text-white shadow-lg shadow-amber-600/30">
                 <Smartphone className="w-6 h-6" />
               </div>
 
@@ -60,17 +60,17 @@ export function PWAInstallButton() {
 
               <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-800 text-indigo-400 font-bold flex items-center justify-center shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center shrink-0">
                     1
                   </div>
                   <p className="text-slate-300">
                     En Safari, pulsa el botón de <strong>Compartir</strong>{' '}
-                    <Share className="w-3.5 h-3.5 inline text-indigo-400 ml-1" /> en la barra inferior.
+                    <Share className="w-3.5 h-3.5 inline text-amber-400 ml-1" /> en la barra inferior.
                   </p>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-800 text-indigo-400 font-bold flex items-center justify-center shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center shrink-0">
                     2
                   </div>
                   <p className="text-slate-300">
@@ -81,7 +81,7 @@ export function PWAInstallButton() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-800 text-indigo-400 font-bold flex items-center justify-center shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-slate-800 text-amber-400 font-bold flex items-center justify-center shrink-0">
                     3
                   </div>
                   <p className="text-slate-300">
@@ -92,7 +92,7 @@ export function PWAInstallButton() {
 
               <button
                 onClick={() => setShowIOSGuide(false)}
-                className="w-full mt-5 py-2.5 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 text-white text-xs shadow-md transition-all cursor-pointer"
+                className="w-full mt-5 py-2.5 rounded-xl font-semibold bg-amber-600 hover:bg-amber-500 text-white text-xs shadow-md transition-all cursor-pointer"
               >
                 Entendido
               </button>
@@ -112,7 +112,7 @@ export function PWAInstallButton() {
       title="Instalar aplicación en PC"
       className="hidden lg:flex px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 transition-all items-center gap-1.5 cursor-pointer shrink-0"
     >
-      <Monitor className="w-3.5 h-3.5 text-indigo-400" />
+      <Monitor className="w-3.5 h-3.5 text-amber-400" />
       <span>Instalar en PC</span>
     </button>
   );

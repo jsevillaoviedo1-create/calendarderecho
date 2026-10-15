@@ -11,6 +11,7 @@ Aplicación de calendario privada y segura desarrollada por **Jorge Sevilla** co
 * 🛡️ **Cloud Firestore con Aislamiento Estricto (Zero-Trust ABAC)**: Reglas de seguridad (`firestore.rules`) que garantizan que ningún usuario pueda consultar, listar o modificar los eventos o datos de otro usuario.
 * 🧬 **Desbloqueo Biométrico Local (WebAuthn)**: Soporte para Touch ID, Face ID y Windows Hello mediante la API de `PublicKeyCredential`. Bloquea la sesión de la pantalla en cualquier momento y reanúdala con tu huella o rostro sin volver a introducir credenciales.
 * 📥 **Importación y Exportación ICS**: Procesamiento de archivos `.ics` con **`ical.js`**, vista previa de eventos antes de importar, importación por lotes en Firestore y descarga de tu calendario en formato RFC 5545 iCalendar estándar.
+* ✨ **Escaneo de horarios con IA**: Sube o pega una foto del horario, revisa los eventos detectados y añádelos al calendario y a la agenda.
 * 🔔 **Notificaciones Push con FCM (Firebase Cloud Messaging)**: Service worker en segundo plano (`firebase-messaging-sw.js`), alertas push para eventos que inician en menos de 15 minutos, avisos por cambios importantes en la agenda y centro de notificaciones con bandeja de leídos/no leídos.
 * 🏷️ **Categorización por Colores**: Etiquetas organizativas (Trabajo, Personal, Estudio, Salud & Deporte, Finanzas, Urgente) con filtrado instantáneo por píldoras.
 
@@ -40,7 +41,7 @@ Aplicación de calendario privada y segura desarrollada por **Jorge Sevilla** co
    npm install
    ```
 
-3. **Configurar el análisis de horarios con IA** (opcional): copia `.env.example` a `.env` y añade una clave de Gemini en `GEMINI_API_KEY`. La clave debe guardarse solo en el servidor, nunca en variables `VITE_` ni en el frontend.
+3. **Configurar las claves**: copia `.env.example` a `.env` y completa `GEMINI_API_KEY` y las variables públicas de Firebase. La clave de Gemini solo se usa desde el servidor.
 
 4. **Iniciar el servidor de desarrollo**:
    ```bash
@@ -67,7 +68,7 @@ Las reglas de Firestore están definidas en `firestore.rules` y aplican las sigu
 
 ## 🌐 Despliegue en Producción
 
-* **Netlify**: El repositorio incluye `netlify.toml` y una función en `netlify/functions/parse-schedule-image.ts` para que el análisis con IA también funcione en el despliegue estático. Configura `GEMINI_API_KEY` en las variables de entorno de Netlify antes de volver a desplegar.
+* **Netlify**: El repositorio incluye `netlify.toml` y `public/_redirects` listos para desplegar automáticamente al conectar con tu rama `main`.
 * **Firebase Hosting**: Ejecuta `firebase deploy --only hosting` para publicar directamente en los servidores de Google.
 
 *Recuerda añadir tu dominio final a la lista de **Dominios Autorizados** en Firebase Console (Authentication → Settings → Authorized Domains).*

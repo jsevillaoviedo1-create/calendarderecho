@@ -258,13 +258,13 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
       {/* Top Header Card */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 shrink-0">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-white tracking-tight">Agenda Día a Día</h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 Grado en Derecho
               </span>
             </div>
@@ -281,7 +281,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setViewMode('day')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'day'
-                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -291,7 +291,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setViewMode('week')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'week'
-                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -301,7 +301,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setViewMode('all')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'all'
-                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -313,9 +313,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             <button
               onClick={onOpenImageScanner}
               title="Pegar o subir foto de un horario o cuadrante para añadir tareas con IA"
-              className="py-2 px-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-500/40 text-indigo-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+              className="py-2 px-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-500/40 text-amber-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
             >
-              <Camera className="w-4 h-4 text-indigo-400" />
+              <Camera className="w-4 h-4 text-amber-400" />
               <span className="hidden sm:inline">Pegar Horario (Foto)</span>
             </button>
           )}
@@ -325,7 +325,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               setEditingTask(null);
               setModalOpen(true);
             }}
-            className="py-2 px-3.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="py-2 px-3.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-md shadow-amber-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Nueva Tarea</span>
@@ -342,7 +342,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={handleSetToday}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                 selectedDate === todayStr
-                  ? 'bg-indigo-600 text-white border-indigo-500'
+                  ? 'bg-amber-600 text-white border-amber-500'
                   : 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
               }`}
             >
@@ -376,7 +376,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
           </div>
         </div>
@@ -389,7 +389,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setSelectedDate(day.dateStr)}
               className={`p-2 rounded-xl text-center transition-all cursor-pointer border flex flex-col items-center gap-1 ${
                 day.isSelected
-                  ? 'bg-indigo-600/30 border-indigo-500 ring-2 ring-indigo-500 shadow-md'
+                  ? 'bg-amber-600/30 border-amber-500 ring-2 ring-amber-500 shadow-md'
                   : day.isToday
                   ? 'bg-slate-800/90 border-slate-700 text-white'
                   : 'bg-slate-950/40 border-slate-800/80 hover:bg-slate-800/60 text-slate-400 hover:text-slate-200'
@@ -401,9 +401,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               <span
                 className={`text-sm font-bold w-6 h-6 rounded-full flex items-center justify-center ${
                   day.isSelected
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-amber-600 text-white'
                     : day.isToday
-                    ? 'bg-indigo-500/20 text-indigo-300'
+                    ? 'bg-amber-500/20 text-amber-300'
                     : 'text-slate-200'
                 }`}
               >
@@ -415,7 +415,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                     className={`text-[9px] font-bold px-1 rounded-full ${
                       day.completedCount === day.count
                         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     }`}
                   >
                     {day.completedCount}/{day.count}
@@ -435,7 +435,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
             <span className="text-xs font-semibold text-slate-400 mr-1 flex items-center gap-1">
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+              <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
               <span>Semestre:</span>
             </span>
             <button
@@ -445,7 +445,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               }}
               className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
                 selectedSemester === 'all'
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
                   : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
               }`}
             >
@@ -458,7 +458,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               }}
               className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
                 selectedSemester === '1er semestre'
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
                   : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
               }`}
             >
@@ -471,7 +471,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               }}
               className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
                 selectedSemester === '2o semestre'
-                  ? 'bg-violet-600 text-white border-violet-500 shadow-sm'
+                  ? 'bg-yellow-600 text-white border-yellow-500 shadow-sm'
                   : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
               }`}
             >
@@ -529,7 +529,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 onClick={() => setSelectedSubject(sub)}
                 className={`px-2 py-0.5 rounded-lg text-xs font-medium cursor-pointer border transition-all ${
                   selectedSubject === sub
-                    ? 'bg-indigo-500/25 text-indigo-300 border-indigo-500/50 font-semibold'
+                    ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 font-semibold'
                     : 'text-slate-400 border-slate-800/60 hover:text-slate-200 hover:bg-slate-800/40'
                 }`}
               >
@@ -544,7 +544,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 onClick={() => setSelectedSubject(sub)}
                 className={`px-2 py-0.5 rounded-lg text-xs font-medium cursor-pointer border transition-all ${
                   selectedSubject === sub
-                    ? 'bg-violet-500/25 text-violet-300 border-violet-500/50 font-semibold'
+                    ? 'bg-yellow-500/25 text-yellow-300 border-yellow-500/50 font-semibold'
                     : 'text-slate-400 border-slate-800/60 hover:text-slate-200 hover:bg-slate-800/40'
                 }`}
               >
@@ -559,7 +559,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         <div className="flex-1 w-full sm:w-auto">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-              <CheckSquare className="w-3.5 h-3.5 text-indigo-400" />
+              <CheckSquare className="w-3.5 h-3.5 text-amber-400" />
               <span>Progreso de estudio:</span>
             </span>
             <span className="font-bold text-white">
@@ -568,7 +568,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
           </div>
           <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
             <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-300"
+              className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-300"
               style={{ width: `${stats.percent}%` }}
             />
           </div>
@@ -581,12 +581,12 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             placeholder={`Añadir tarea rápida para ${selectedDate}...`}
             value={quickInput}
             onChange={(e) => setQuickInput(e.target.value)}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <button
             type="submit"
             disabled={!quickInput.trim()}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-50 transition-all shrink-0 active:scale-95 flex items-center gap-1"
+            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-50 transition-all shrink-0 active:scale-95 flex items-center gap-1"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Añadir</span>
@@ -598,7 +598,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
       <div className="space-y-2.5">
         {displayedTasks.length === 0 ? (
           <div className="py-14 px-4 text-center rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 flex flex-col items-center justify-center">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
               <ListTodo className="w-6 h-6" />
             </div>
             <h4 className="text-sm font-semibold text-white">No hay tareas para este criterio</h4>
@@ -610,7 +610,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 setEditingTask(null);
                 setModalOpen(true);
               }}
-              className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-md"
+              className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-md"
             >
               <Plus className="w-4 h-4" />
               <span>Crear primera tarea</span>
@@ -636,7 +636,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                   <button
                     onClick={() => toggleTaskCompleted(task.id)}
                     title={task.completed ? 'Marcar como pendiente' : 'Marcar como completada'}
-                    className="mt-0.5 text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer shrink-0"
+                    className="mt-0.5 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer shrink-0"
                   >
                     {task.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-400 drop-shadow" />
@@ -662,9 +662,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                             isSem1
-                              ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
+                              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                               : isSem2
-                              ? 'bg-violet-500/15 text-violet-300 border-violet-500/30'
+                              ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30'
                               : 'bg-slate-800 text-slate-400 border-slate-700'
                           }`}
                         >
@@ -726,9 +726,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                   <button
                     onClick={() => handleSyncToCalendar(task)}
                     title="Añadir como evento en el Calendario principal"
-                    className="p-1.5 text-xs text-slate-400 hover:text-indigo-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                    className="p-1.5 text-xs text-slate-400 hover:text-amber-300 bg-slate-950/60 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <CalendarPlus className="w-3.5 h-3.5 text-indigo-400" />
+                    <CalendarPlus className="w-3.5 h-3.5 text-amber-400" />
                     <span className="hidden md:inline text-[11px]">Al Calendario</span>
                   </button>
 

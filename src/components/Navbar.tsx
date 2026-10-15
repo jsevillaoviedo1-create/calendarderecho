@@ -49,13 +49,11 @@ export function Navbar({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
-            <CalendarIcon className="w-5 h-5 text-white" />
-          </div>
+          <img src="/icon-192.png" alt="" className="w-10 h-10 rounded-xl object-cover shadow-md shadow-amber-500/20" />
           <div className="hidden sm:block">
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-base tracking-tight text-white">Calendario Derecho</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 PRO
               </span>
             </div>
@@ -70,7 +68,7 @@ export function Navbar({
               onClick={() => onSelectTab('calendar')}
               className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'calendar'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -81,7 +79,7 @@ export function Navbar({
               onClick={() => onSelectTab('agenda')}
               className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'agenda'
-                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -99,7 +97,7 @@ export function Navbar({
             placeholder="Buscar eventos, ubicaciones o notas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            className="w-full bg-slate-950/60 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
           />
           {searchQuery && (
             <button
@@ -131,7 +129,7 @@ export function Navbar({
               className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
             >
               {isBiometricEnrolled ? (
-                <Fingerprint className="w-4 h-4 text-indigo-400" />
+                <Fingerprint className="w-4 h-4 text-amber-400" />
               ) : (
                 <Lock className="w-4 h-4 text-amber-400" />
               )}
@@ -156,9 +154,9 @@ export function Navbar({
             <button
               onClick={onOpenImageScanner}
               title="Pegar o subir foto de un horario o cuadrante para añadirlo con IA"
-              className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-500/40 text-indigo-200 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-500/40 text-amber-200 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
             >
-              <Camera className="w-4 h-4 text-indigo-400" />
+              <Camera className="w-4 h-4 text-amber-400" />
               <span className="hidden sm:inline">Pegar Horario (Foto)</span>
             </button>
           )}
@@ -168,14 +166,14 @@ export function Navbar({
             onClick={onOpenICS}
             className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
           >
-            <Upload className="w-4 h-4 text-violet-400" />
+            <Upload className="w-4 h-4 text-yellow-400" />
             <span className="hidden sm:inline">Importar .ICS</span>
           </button>
 
           {/* New Event Button */}
           <button
             onClick={onOpenNewEvent}
-            className="py-2 px-3 sm:px-4 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="py-2 px-3 sm:px-4 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-md shadow-amber-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Evento</span>
@@ -192,10 +190,10 @@ export function Navbar({
                   <img
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'Avatar'}
-                    className="w-7 h-7 rounded-lg object-cover ring-1 ring-indigo-500"
+                    className="w-7 h-7 rounded-lg object-cover ring-1 ring-amber-500"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-lg bg-amber-600 flex items-center justify-center font-bold text-xs">
                     {(userProfile?.displayName || currentUser.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
@@ -223,7 +221,7 @@ export function Navbar({
                       onClick={onOpenBiometrics}
                       className="w-full px-3 py-2 text-xs text-left text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
                     >
-                      <Fingerprint className="w-4 h-4 text-indigo-400" />
+                      <Fingerprint className="w-4 h-4 text-amber-400" />
                       <div>
                         <span>Seguridad Biométrica</span>
                         <p className="text-[10px] text-slate-400">

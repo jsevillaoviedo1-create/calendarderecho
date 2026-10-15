@@ -122,7 +122,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
             <Tag className="w-5 h-5" />
           </div>
           <div>
@@ -142,7 +142,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
         {/* Create new category form */}
         <form onSubmit={handleCreate} className="p-4 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-3 mb-5">
           <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-slate-300">
-            <Plus className="w-3.5 h-3.5 text-indigo-400" />
+            <Plus className="w-3.5 h-3.5 text-amber-400" />
             <span>Crear nueva categoría</span>
           </h4>
 
@@ -154,7 +154,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
               placeholder="Ej. Tareas Derecho, Seminarios, Prácticas..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
 
@@ -204,7 +204,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="px-3.5 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-1.5 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{loading ? 'Añadiendo...' : 'Añadir Categoría'}</span>
@@ -229,10 +229,10 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
                 return (
                   <div
                     key={cat.id}
-                    className="p-3 rounded-xl bg-slate-950 border border-indigo-500/50 shadow-md col-span-1 sm:col-span-2 space-y-2.5 animate-in fade-in"
+                    className="p-3 rounded-xl bg-slate-950 border border-amber-500/50 shadow-md col-span-1 sm:col-span-2 space-y-2.5 animate-in fade-in"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                         <Pencil className="w-3.5 h-3.5" />
                         <span>Editar Categoría</span>
                       </span>
@@ -251,7 +251,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         placeholder="Nombre de la categoría"
-                        className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                       />
                       <div className="flex items-center gap-2">
                         <input
@@ -264,7 +264,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
                           type="button"
                           onClick={() => handleSaveEdit(cat.id)}
                           disabled={loading || !editName.trim()}
-                          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" />
                           <span>Guardar</span>
@@ -307,7 +307,7 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
                     <button
                       onClick={() => handleStartEdit(cat)}
                       title="Editar nombre y color"
-                      className="p-1 text-slate-400 hover:text-indigo-300 rounded-lg hover:bg-indigo-500/10 transition-colors cursor-pointer"
+                      className="p-1 text-slate-400 hover:text-amber-300 rounded-lg hover:bg-amber-500/10 transition-colors cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
