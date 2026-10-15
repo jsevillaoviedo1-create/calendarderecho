@@ -28,6 +28,7 @@ import {
   Database,
   Lock,
   BookOpen,
+  RefreshCw,
 } from 'lucide-react';
 
 function CalendarApp() {
@@ -76,6 +77,24 @@ function CalendarApp() {
       </div>
     );
   }
+
+  const handleForceUpdate = async () => {
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+        }
+      }
+    } catch (e) {
+      console.warn('Error clearing caches', e);
+    }
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
@@ -265,9 +284,19 @@ function CalendarApp() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-400">hecho por Jorge Sevilla</span>
           </div>
-          <div className="flex items-center gap-1.5 text-emerald-400/90 font-medium">
-            <Shield className="w-3.5 h-3.5" />
-            <span>informacion guardada en local no se sube informacion a la nube</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleForceUpdate}
+              title="Borra la caché del navegador y recarga la versión más reciente"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer text-[11px]"
+            >
+              <RefreshCw className="w-3 h-3 text-indigo-400" />
+              <span>Forzar última versión</span>
+            </button>
+            <div className="flex items-center gap-1.5 text-emerald-400/90 font-medium">
+              <Shield className="w-3.5 h-3.5" />
+              <span>informacion guardada en local no se sube informacion a la nube</span>
+            </div>
           </div>
         </div>
       </footer>
