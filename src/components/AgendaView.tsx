@@ -27,9 +27,14 @@ import {
   CalendarPlus,
   Clock,
   Layers,
+  Camera,
 } from 'lucide-react';
 
-export function AgendaView() {
+interface AgendaViewProps {
+  onOpenImageScanner?: () => void;
+}
+
+export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
   const {
     tasks,
     todayTasks,
@@ -303,6 +308,17 @@ export function AgendaView() {
               Todas
             </button>
           </div>
+
+          {onOpenImageScanner && (
+            <button
+              onClick={onOpenImageScanner}
+              title="Pegar o subir foto de un horario o cuadrante para añadir tareas con IA"
+              className="py-2 px-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-500/40 text-indigo-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+            >
+              <Camera className="w-4 h-4 text-indigo-400" />
+              <span className="hidden sm:inline">Pegar Horario (Foto)</span>
+            </button>
+          )}
 
           <button
             onClick={() => {

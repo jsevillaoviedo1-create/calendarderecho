@@ -16,6 +16,7 @@ import {
   Sparkles,
   Tag,
   BookOpen,
+  Camera,
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -25,6 +26,7 @@ interface NavbarProps {
   onOpenICS: () => void;
   onOpenBiometrics: () => void;
   onOpenCategories?: () => void;
+  onOpenImageScanner?: () => void;
   activeTab?: 'calendar' | 'agenda';
   onSelectTab?: (tab: 'calendar' | 'agenda') => void;
 }
@@ -34,6 +36,7 @@ export function Navbar({
   onOpenICS,
   onOpenBiometrics,
   onOpenCategories,
+  onOpenImageScanner,
   activeTab = 'calendar',
   onSelectTab,
 }: NavbarProps) {
@@ -145,6 +148,18 @@ export function Navbar({
             >
               <Tag className="w-4 h-4 text-emerald-400" />
               <span className="hidden md:inline">Categorías</span>
+            </button>
+          )}
+
+          {/* Scan Schedule Photo (AI) */}
+          {onOpenImageScanner && (
+            <button
+              onClick={onOpenImageScanner}
+              title="Pegar o subir foto de un horario o cuadrante para añadirlo con IA"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 border border-indigo-500/40 text-indigo-200 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+            >
+              <Camera className="w-4 h-4 text-indigo-400" />
+              <span className="hidden sm:inline">Pegar Horario (Foto)</span>
             </button>
           )}
 

@@ -16,6 +16,7 @@ import { ICSImportModal } from './components/ICSImportModal';
 import { BiometricLockModal } from './components/BiometricLockModal';
 import { BiometricSettingsModal } from './components/BiometricSettingsModal';
 import { CategoryManagerModal } from './components/CategoryManagerModal';
+import { ImageScheduleScannerModal } from './components/ImageScheduleScannerModal';
 import { AuthModal } from './components/AuthModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { CalendarEventItem } from './types/calendar';
@@ -43,6 +44,7 @@ function CalendarApp() {
   const [icsModalOpen, setIcsModalOpen] = useState(false);
   const [biometricsModalOpen, setBiometricsModalOpen] = useState(false);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [imageScannerOpen, setImageScannerOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
   // New event trigger
@@ -110,6 +112,7 @@ function CalendarApp() {
         onOpenICS={() => setIcsModalOpen(true)}
         onOpenBiometrics={() => setBiometricsModalOpen(true)}
         onOpenCategories={() => setCategoryModalOpen(true)}
+        onOpenImageScanner={() => setImageScannerOpen(true)}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
       />
@@ -200,9 +203,12 @@ function CalendarApp() {
                 onSelectDate={handleSelectDate}
                 onSelectEvent={handleSelectEvent}
                 onOpenCategoryManager={() => setCategoryModalOpen(true)}
+                onOpenImageScanner={() => setImageScannerOpen(true)}
               />
             ) : (
-              <AgendaView />
+              <AgendaView
+                onOpenImageScanner={() => setImageScannerOpen(true)}
+              />
             )}
           </>
         ) : (
@@ -276,6 +282,11 @@ function CalendarApp() {
       <CategoryManagerModal
         isOpen={categoryModalOpen}
         onClose={() => setCategoryModalOpen(false)}
+      />
+
+      <ImageScheduleScannerModal
+        isOpen={imageScannerOpen}
+        onClose={() => setImageScannerOpen(false)}
       />
 
       {/* Footer */}
