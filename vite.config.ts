@@ -11,14 +11,14 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+        includeAssets: ['favicon.png', 'apple-touch-icon.png'],
         manifest: {
           id: '/',
           name: 'Calendario Derecho Pro',
           short_name: 'CalDerecho',
           description: 'Calendario Derecho Pro - Tu calendario completamente privado.',
-          theme_color: '#020617',
-          background_color: '#020617',
+          theme_color: '#facc15',
+          background_color: '#292a30',
           display: 'standalone',
           orientation: 'portrait-primary',
           start_url: '/',

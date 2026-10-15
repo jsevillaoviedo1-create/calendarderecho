@@ -40,13 +40,15 @@ Aplicación de calendario privada y segura desarrollada por **Jorge Sevilla** co
    npm install
    ```
 
-3. **Iniciar el servidor de desarrollo**:
+3. **Configurar el análisis de horarios con IA** (opcional): copia `.env.example` a `.env` y añade una clave de Gemini en `GEMINI_API_KEY`. La clave debe guardarse solo en el servidor, nunca en variables `VITE_` ni en el frontend.
+
+4. **Iniciar el servidor de desarrollo**:
    ```bash
    npm run dev
    ```
    Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-4. **Compilar para producción**:
+5. **Compilar para producción**:
    ```bash
    npm run build
    ```
@@ -65,7 +67,7 @@ Las reglas de Firestore están definidas en `firestore.rules` y aplican las sigu
 
 ## 🌐 Despliegue en Producción
 
-* **Netlify**: El repositorio incluye `netlify.toml` y `public/_redirects` listos para desplegar automáticamente al conectar con tu rama `main`.
+* **Netlify**: El repositorio incluye `netlify.toml` y una función en `netlify/functions/parse-schedule-image.ts` para que el análisis con IA también funcione en el despliegue estático. Configura `GEMINI_API_KEY` en las variables de entorno de Netlify antes de volver a desplegar.
 * **Firebase Hosting**: Ejecuta `firebase deploy --only hosting` para publicar directamente en los servidores de Google.
 
 *Recuerda añadir tu dominio final a la lista de **Dominios Autorizados** en Firebase Console (Authentication → Settings → Authorized Domains).*
