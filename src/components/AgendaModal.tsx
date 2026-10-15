@@ -78,6 +78,16 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
     }
   };
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -123,41 +133,57 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[92vh] overflow-hidden">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="w-full max-w-lg md:max-w-xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh] relative animate-in zoom-in-95 duration-150"
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Fixed Header */}
+        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/90 bg-slate-900/95 flex items-center justify-between shrink-0 z-10">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 shrink-0">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-white truncate">
+                {taskToEdit ? 'Editar Tarea / Asignatura' : 'Nueva Tarea en Agenda'}
+              </h3>
+              <p className="text-xs text-slate-400 hidden sm:block truncate">
+                Planifica tu estudio día a día según el semestre y la asignatura
+              </p>
+            </div>
+          </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/30 shrink-0">
-            <BookOpen className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white">
-              {taskToEdit ? 'Editar Tarea / Asignatura' : 'Nueva Tarea en Agenda'}
-            </h3>
-            <p className="text-xs text-slate-400">
-              Planifica tu estudio día a día según el semestre y la asignatura de Derecho.
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            title="Cerrar ventana (Esc)"
+            aria-label="Cerrar"
+            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 border border-transparent hover:border-slate-700/80 transition-colors cursor-pointer shrink-0 ml-2"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-300 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+        {/* Form with scrollable body and sticky footer */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4">
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-300 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4 pr-1">
-          {/* Title */}
-          <div>
+            {/* Title */}
+            <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
               Título o apunte del día *
             </label>
@@ -360,19 +386,21 @@ export function AgendaModal({ isOpen, onClose, taskToEdit, defaultDate }: Agenda
             </label>
           )}
 
-          {/* Footer action buttons */}
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+          </div>
+
+          {/* Sticky Footer - Always Visible and Clickable */}
+          <div className="px-5 sm:px-6 py-3 sm:py-3.5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-end gap-2.5 shrink-0 z-10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || !title.trim()}
-              className="px-5 py-2 text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <span>Guardando...</span>
