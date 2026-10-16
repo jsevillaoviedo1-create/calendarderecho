@@ -102,7 +102,8 @@ Reglas:
       try {
         const response = await ai.models.generateContent({
           model,
-          contents: {
+          contents: [{
+            role: 'user',
             parts: [
               {
                 inlineData: {
@@ -114,7 +115,7 @@ Reglas:
                 text: 'Extrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.',
               },
             ],
-          },
+          }],
           config: {
             systemInstruction: systemPrompt,
             temperature: 0.1,
