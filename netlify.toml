@@ -4,8 +4,20 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# API Redirects to Netlify Functions
+[[redirects]]
+  from = "/api/ai/parse-schedule-image"
+  to = "/.netlify/functions/parse-schedule-image"
+  status = 200
+
+[[redirects]]
+  from = "/api/ai/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # SPA redirect rule
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+

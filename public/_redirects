@@ -1,1 +1,3 @@
+/api/ai/parse-schedule-image  /.netlify/functions/parse-schedule-image  200
+/api/ai/*  /.netlify/functions/:splat  200
 /*    /index.html   200

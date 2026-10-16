@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
-/* FullCalendar Custom Theme Styles */
+/* FullCalendar Custom Theme Styles - Dark Mode, Blanco & Amarillo */
 .chronos-calendar-container {
-  --fc-border-color: #1e293b;
+  --fc-border-color: #27272a;
   --fc-page-bg-color: transparent;
-  --fc-neutral-bg-color: #0f172a;
-  --fc-list-event-hover-bg-color: #1e293b;
-  --fc-today-bg-color: rgba(234, 179, 8, 0.11);
+  --fc-neutral-bg-color: #09090b;
+  --fc-list-event-hover-bg-color: #18181b;
+  --fc-today-bg-color: rgba(250, 204, 21, 0.1);
 }
 
 .fc .fc-toolbar-title {
   font-size: 1.15rem !important;
   font-weight: 700 !important;
-  color: #f8fafc !important;
+  color: #ffffff !important;
   letter-spacing: -0.02em;
 }
 
 .fc .fc-col-header-cell {
-  background-color: #0b1120 !important;
+  background-color: #09090b !important;
   padding: 8px 0 !important;
 }
 
 .fc .fc-col-header-cell-cushion {
-  color: #94a3b8 !important;
+  color: #fbbf24 !important;
   font-size: 0.75rem !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
   text-decoration: none !important;
 }
 
 .fc .fc-daygrid-day-number {
-  color: #94a3b8 !important;
+  color: #e4e4e7 !important;
   font-size: 0.8rem !important;
   font-weight: 500 !important;
   padding: 6px 8px !important;
@@ -39,8 +39,17 @@
 }
 
 .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-  color: #facc15 !important;
-  font-weight: 700 !important;
+  color: #000000 !important;
+  background-color: #facc15 !important;
+  border-radius: 9999px !important;
+  font-weight: 800 !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px !important;
+  padding: 0 !important;
 }
 
 .fc .fc-daygrid-day-frame {
@@ -49,7 +58,7 @@
 }
 
 .fc .fc-daygrid-day:hover .fc-daygrid-day-frame {
-  background-color: rgba(30, 41, 59, 0.4);
+  background-color: rgba(39, 39, 42, 0.4);
 }
 
 .fc-event {
@@ -59,12 +68,12 @@
   font-weight: 500 !important;
   cursor: pointer !important;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .fc-event:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 .fc-event-title {
@@ -72,9 +81,9 @@
 }
 
 .fc .fc-more-link {
-  color: #fde047 !important;
+  color: #facc15 !important;
   font-size: 0.75rem !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
 }
 
 /* TimeGrid & Agenda overrides */

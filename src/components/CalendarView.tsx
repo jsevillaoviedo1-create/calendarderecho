@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import { useCalendar } from '../context/CalendarContext';
 import { CalendarEventItem, DEFAULT_CATEGORIES } from '../types/calendar';
+import { DayPreviewPopup } from './DayPreviewPopup';
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,8 @@ interface CalendarViewProps {
   onSelectEvent: (event: CalendarEventItem) => void;
   onOpenCategoryManager?: () => void;
   onOpenImageScanner?: () => void;
+  onOpenNewTask?: (dateStr: string) => void;
+  navigateToDate?: string | null;
 }
 
 export function CalendarView({
@@ -30,9 +33,20 @@ export function CalendarView({
   onSelectEvent,
   onOpenCategoryManager,
   onOpenImageScanner,
+  onOpenNewTask,
+  navigateToDate,
 }: CalendarViewProps) {
   const { filteredEvents, updateEvent, selectedCategory, setSelectedCategory, allCategories, loading } = useCalendar();
   const calendarRef = useRef<FullCalendar | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [previewDate, setPreviewDate] = useState<string | null>(null);
+
+  // Navigate to target date when triggered from search or widget
+  useEffect(() => {
+    if (navigateToDate && calendarRef.current) {
+      calendarRef.current.getApi().gotoDate(navigateToDate);
+    }
+  }, [navigateToDate]);
 
   // FullCalendar event source transformation
   const calendarEvents = useMemo(() => {
@@ -120,6 +134,123 @@ export function CalendarView({
     calendarRef.current?.getApi().changeView(viewName);
   };
 
+  // 1-Second Desktop Hover & Mobile Long-Press Day Preview Pop-up
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let hoverTimer: any = null;
+    let hoveredDate: string | null = null;
+    let touchTimer: any = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const extractDateFromEl = (target: HTMLElement | null): string | null => {
+      if (!target) return null;
+
+      // 1. Check data-date attribute on day cell
+      const dayEl = target.closest('[data-date]') as HTMLElement | null;
+      if (dayEl && dayEl.dataset.date) {
+        return dayEl.dataset.date;
+      }
+
+      // 2. Check if hovering/touching an event element
+      const eventEl = target.closest('.fc-event') as HTMLElement | null;
+      if (eventEl) {
+        const parentDay = eventEl.closest('[data-date]') as HTMLElement | null;
+        if (parentDay?.dataset?.date) return parentDay.dataset.date;
+      }
+
+      return null;
+    };
+
+    // Desktop hover: exactly 1 second (1000ms) uninterrupted delay
+    const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const dateStr = extractDateFromEl(target);
+
+      if (!dateStr) {
+        if (hoveredDate) {
+          clearTimeout(hoverTimer);
+          hoveredDate = null;
+        }
+        return;
+      }
+
+      // If moving inside the same day cell or event, keep existing timer running!
+      if (hoveredDate === dateStr) {
+        return;
+      }
+
+      clearTimeout(hoverTimer);
+      hoveredDate = dateStr;
+      hoverTimer = setTimeout(() => {
+        setPreviewDate(dateStr);
+      }, 1000);
+    };
+
+    const handleMouseLeave = () => {
+      clearTimeout(hoverTimer);
+      hoveredDate = null;
+    };
+
+    // Mobile touch: long press (touch & hold for 500ms with haptic vibration)
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+
+      const target = e.target as HTMLElement;
+      const dateStr = extractDateFromEl(target);
+      if (!dateStr) return;
+
+      clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try {
+            navigator.vibrate([35, 45, 35]);
+          } catch {}
+        }
+        setPreviewDate(dateStr);
+      }, 500);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchTimer) return;
+      const touch = e.touches[0];
+      const diffX = Math.abs(touch.clientX - touchStartX);
+      const diffY = Math.abs(touch.clientY - touchStartY);
+      if (diffX > 10 || diffY > 10) {
+        clearTimeout(touchTimer);
+        touchTimer = null;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      clearTimeout(touchTimer);
+      touchTimer = null;
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: true });
+    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchcancel', handleTouchEnd);
+
+    return () => {
+      clearTimeout(hoverTimer);
+      clearTimeout(touchTimer);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, []);
+
   // Stats calculation
   const stats = useMemo(() => {
     const now = new Date();
@@ -134,14 +265,15 @@ export function CalendarView({
   return (
     <div className="flex flex-col gap-4">
       {/* Category Filter Pills & Metrics */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 border border-slate-800/80 p-3 rounded-2xl">
+      {/* Category filter strip + quick stats */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-black border border-yellow-500/25 p-3 rounded-2xl">
         <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer border ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
               selectedCategory === 'all'
-                ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
-                : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
+                ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                : 'bg-neutral-900 text-yellow-400/80 border-neutral-800 hover:text-white'
             }`}
           >
             Todas ({filteredEvents.length})
@@ -151,10 +283,10 @@ export function CalendarView({
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.name)}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-medium shrink-0 transition-all flex items-center gap-1.5 cursor-pointer border ${
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer border ${
                 selectedCategory === cat.name
-                  ? 'bg-slate-800 text-white border-slate-600 shadow-sm ring-1 ring-slate-600'
-                  : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
+                  ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                  : 'bg-neutral-900 text-slate-300 border-neutral-800 hover:text-white'
               }`}
             >
               <span
@@ -169,7 +301,7 @@ export function CalendarView({
             <button
               onClick={onOpenCategoryManager}
               title="Gestionar y crear categorías personalizadas"
-              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/30"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30"
             >
               <span>+ Categoría</span>
             </button>
@@ -178,23 +310,23 @@ export function CalendarView({
 
         {/* Quick stats badge */}
         <div className="flex items-center gap-3 shrink-0 text-xs text-slate-400 self-end sm:self-center">
-          <div className="flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/60">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-1 bg-neutral-900 px-2.5 py-1 rounded-lg border border-yellow-500/20">
+            <Clock className="w-3.5 h-3.5 text-yellow-400" />
             <span>Hoy: <strong className="text-white">{stats.today}</strong></span>
           </div>
-          <div className="flex items-center gap-1 bg-slate-800/60 px-2.5 py-1 rounded-lg border border-slate-700/60">
-            <CalendarIcon className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-1 bg-neutral-900 px-2.5 py-1 rounded-lg border border-yellow-500/20">
+            <CalendarIcon className="w-3.5 h-3.5 text-yellow-400" />
             <span>Total: <strong className="text-white">{stats.total}</strong></span>
           </div>
         </div>
       </div>
 
       {/* Main FullCalendar Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
+      <div className="bg-black border border-yellow-500/30 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/80 relative overflow-hidden">
         {loading && (
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center z-20">
-            <div className="flex items-center gap-2.5 text-amber-400 text-sm font-semibold bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 shadow-lg">
-              <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-20">
+            <div className="flex items-center gap-2.5 text-yellow-400 text-sm font-semibold bg-neutral-900 px-4 py-2 rounded-xl border border-yellow-500/30 shadow-lg">
+              <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
               <span>Sincronizando con Firestore...</span>
             </div>
           </div>
@@ -205,22 +337,22 @@ export function CalendarView({
           <div className="flex items-center gap-2">
             <button
               onClick={handleToday}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-900 hover:bg-neutral-800 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30 transition-colors cursor-pointer"
             >
               Hoy
             </button>
-            <div className="flex items-center bg-slate-800/80 rounded-xl border border-slate-700 p-0.5">
+            <div className="flex items-center bg-neutral-900 rounded-xl border border-yellow-500/20 p-0.5">
               <button
                 onClick={handlePrev}
                 aria-label="Mes anterior"
-                className="p-1 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Mes siguiente"
-                className="p-1 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                className="p-1 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -230,9 +362,9 @@ export function CalendarView({
               <button
                 onClick={onOpenImageScanner}
                 title="Pegar o subir foto de un horario o cuadrante para añadirlo con IA"
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-500/40 text-amber-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-900 hover:bg-neutral-800 border border-yellow-500/40 text-yellow-400 hover:text-yellow-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
               >
-                <Camera className="w-3.5 h-3.5 text-amber-400" />
+                <Camera className="w-3.5 h-3.5 text-yellow-400" />
                 <span>Pegar Horario (Foto)</span>
               </button>
             )}
@@ -267,8 +399,8 @@ export function CalendarView({
           </div>
         </div>
 
-        {/* FullCalendar Component */}
-        <div className="chronos-calendar-container">
+        {/* FullCalendar Component wrapped with containerRef for 1s hover and mobile long-press detection */}
+        <div ref={containerRef} className="chronos-calendar-container select-none">
           <FullCalendar
             ref={calendarRef}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
@@ -288,6 +420,20 @@ export function CalendarView({
             events={calendarEvents}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
+            eventMouseEnter={(info: any) => {
+              const d = info.event.startStr ? info.event.startStr.split('T')[0] : null;
+              if (d) {
+                const timer = setTimeout(() => {
+                  setPreviewDate(d);
+                }, 1000);
+                (info.el as any)._previewTimer = timer;
+              }
+            }}
+            eventMouseLeave={(info: any) => {
+              if ((info.el as any)._previewTimer) {
+                clearTimeout((info.el as any)._previewTimer);
+              }
+            }}
             eventDrop={handleEventDrop}
             eventResize={handleEventResize}
             height="auto"
@@ -302,6 +448,22 @@ export function CalendarView({
           />
         </div>
       </div>
+
+      {/* Day Preview Pop-up on 1s hover or mobile touch-and-hold */}
+      <DayPreviewPopup
+        isOpen={Boolean(previewDate)}
+        dateStr={previewDate}
+        onClose={() => setPreviewDate(null)}
+        onSelectEvent={onSelectEvent}
+        onOpenNewEvent={(dateStr) => onSelectDate(dateStr, false)}
+        onOpenNewTask={(dateStr) => {
+          if (onOpenNewTask) {
+            onOpenNewTask(dateStr);
+          } else {
+            onSelectDate(dateStr, false);
+          }
+        }}
+      />
     </div>
   );
 }

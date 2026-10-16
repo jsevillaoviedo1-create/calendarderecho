@@ -16,12 +16,52 @@ const PORT = Number(process.env.PORT) || 3000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-const ai = new GoogleGenAI();
+// Enable CORS and OPTIONS preflight for all /api routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-gemini-api-key');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+// Health check and API status endpoint
+app.get(['/api/ai/health', '/api/ai/parse-schedule-image', '/.netlify/functions/parse-schedule-image'], (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'Gemini Schedule Parser API',
+    hasServerKey: Boolean(process.env.GEMINI_API_KEY),
+    recommendedModel: 'gemini-3.8-flash',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Endpoint to parse schedule images (cuadrantes, horarios, apuntes)
-app.post('/api/ai/parse-schedule-image', async (req, res) => {
+app.post(['/api/ai/parse-schedule-image', '/.netlify/functions/parse-schedule-image'], async (req, res) => {
   try {
-    const { imageBase64, mimeType = 'image/jpeg', currentYear = new Date().getFullYear(), availableCategories = [] } = req.body;
+    const {
+      imageBase64,
+      mimeType = 'image/jpeg',
+      currentYear = new Date().getFullYear(),
+      availableCategories = [],
+      apiKey: customKey,
+    } = req.body;
+
+    const effectiveApiKey =
+      (req.headers['x-gemini-api-key'] as string) ||
+      customKey ||
+      process.env.GEMINI_API_KEY ||
+      process.env.VITE_GEMINI_API_KEY;
+
+    if (!effectiveApiKey) {
+      return res.status(500).json({
+        error: 'No hay ninguna clave de API de Gemini configurada. Por favor introduce tu GEMINI_API_KEY.',
+      });
+    }
+
+    const ai = new GoogleGenAI({ apiKey: effectiveApiKey });
 
     if (!imageBase64) {
       return res.status(400).json({ error: 'Falta la imagen en base64' });
@@ -54,7 +94,7 @@ Reglas:
 6. "category": Selecciona la categoría más afín de esta lista: [${catListStr}]. Para clases y asignaturas universitarias suele ser "Estudio", para exámenes parciales "Parciales", para exámenes finales "Examen final".
 7. "description": Información adicional como aula, grupo, profesor o notas que aparezcan en el cuadrante.`;
 
-    const candidateModels = ['gemini-3.1-flash-lite', 'gemini-2.5-flash'];
+    const candidateModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
     let lastError: any = null;
     let responseText: string | null = null;
 
