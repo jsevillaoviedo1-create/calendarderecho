@@ -228,10 +228,10 @@ export function Navbar({
 
                   {userMenuOpen && (
                     <div
-                      className="absolute right-0 mt-2 w-64 bg-black border border-yellow-500/40 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in duration-150"
+                      className="absolute right-0 mt-2 w-64 bg-gradient-to-b from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_28px_rgba(234,179,8,0.12)] py-2 z-50 animate-in fade-in duration-150"
                       onClick={() => setUserMenuOpen(false)}
                     >
-                      <div className="px-4 py-2.5 border-b border-neutral-800">
+                      <div className="px-4 py-2.5 border-b border-yellow-500/25 bg-neutral-950/60">
                         <p className="text-xs font-bold text-white truncate">
                           {userProfile?.displayName || currentUser.displayName || 'Usuario'}
                         </p>
@@ -246,7 +246,7 @@ export function Navbar({
                         {onOpenWidget && (
                           <button
                             onClick={onOpenWidget}
-                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                           >
                             <Smartphone className="w-4 h-4 text-yellow-400" />
                             <div>
@@ -259,12 +259,12 @@ export function Navbar({
                         {onOpenImageScanner && (
                           <button
                             onClick={onOpenImageScanner}
-                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                           >
                             <Camera className="w-4 h-4 text-yellow-400" />
                             <div>
                               <span className="font-semibold text-white">Foto Cuadrante (IA)</span>
-                              <p className="text-[10px] text-slate-400">Escanear foto de horario</p>
+                              <p className="text-[10px] text-yellow-300/70">Escanear foto de horario</p>
                             </div>
                           </button>
                         )}
@@ -272,35 +272,35 @@ export function Navbar({
                         {onOpenCategories && (
                           <button
                             onClick={onOpenCategories}
-                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                            className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                           >
                             <Tag className="w-4 h-4 text-yellow-400" />
                             <div>
                               <span className="font-semibold text-white">Gestionar Categorías</span>
-                              <p className="text-[10px] text-slate-400">Crear y personalizar etiquetas</p>
+                              <p className="text-[10px] text-yellow-300/70">Crear y personalizar etiquetas</p>
                             </div>
                           </button>
                         )}
 
                         <button
                           onClick={onOpenICS}
-                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                         >
                           <Upload className="w-4 h-4 text-yellow-400" />
                           <div>
                             <span className="font-semibold text-white">Importar archivo .ICS</span>
-                            <p className="text-[10px] text-slate-400">Sincronizar calendario externo</p>
+                            <p className="text-[10px] text-yellow-300/70">Sincronizar calendario externo</p>
                           </div>
                         </button>
 
                         <button
                           onClick={onOpenBiometrics}
-                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                         >
                           <Fingerprint className="w-4 h-4 text-yellow-400" />
                           <div>
                             <span className="font-semibold text-white">Seguridad Biométrica</span>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] text-yellow-300/70">
                               {isBiometricEnrolled ? 'Enrolado en este equipo' : 'Configurar WebAuthn'}
                             </p>
                           </div>
@@ -308,7 +308,7 @@ export function Navbar({
 
                         <button
                           onClick={lockSession}
-                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-900 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                          className="w-full px-3 py-2 text-xs text-left text-slate-200 hover:text-white hover:bg-neutral-800/80 rounded-xl flex items-center gap-2 transition-all cursor-pointer border border-transparent hover:border-yellow-500/30"
                         >
                           <Lock className="w-4 h-4 text-yellow-400" />
                           <span className="font-semibold text-white">Bloquear Pantalla</span>
@@ -316,7 +316,7 @@ export function Navbar({
 
                         <button
                           onClick={() => logout()}
-                          className="w-full px-3 py-2 text-xs text-left text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                          className="w-full px-3 py-2 text-xs text-left text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl flex items-center gap-2 transition-colors cursor-pointer border border-transparent"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Cerrar Sesión</span>

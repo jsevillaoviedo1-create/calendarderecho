@@ -170,7 +170,7 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
     <div ref={containerRef} className="relative w-full max-w-md">
       {/* Search Input Bar */}
       <div className="relative flex items-center">
-        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors" />
+        <Search className="w-4 h-4 text-yellow-400/60 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors" />
         <input
           ref={inputRef}
           type="text"
@@ -181,7 +181,7 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
             setSearchQuery(e.target.value);
             setIsOpen(true);
           }}
-          className="w-full bg-slate-950/70 hover:bg-slate-950/90 focus:bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-10 pr-9 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-inner transition-all"
+          className="w-full bg-neutral-900/80 hover:bg-neutral-900 focus:bg-neutral-950 border border-yellow-500/30 focus:border-yellow-400 rounded-xl pl-10 pr-9 py-2 text-xs sm:text-sm text-white placeholder-yellow-300/40 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 shadow-inner transition-all backdrop-blur-sm"
         />
 
         {searchQuery ? (
@@ -192,38 +192,38 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
               inputRef.current?.focus();
             }}
             title="Limpiar búsqueda"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white rounded-md hover:bg-slate-800 transition-colors cursor-pointer"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-yellow-400/70 hover:text-white rounded-md hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         ) : null}
       </div>
 
-      {/* Dropdown Results Popover */}
+      {/* Dropdown Results Popover with HUD aesthetic */}
       {isOpen && searchQuery.trim() && (
-        <div className="absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[75vh] flex flex-col animate-in fade-in slide-in-from-top-2 duration-150 backdrop-blur-xl">
+        <div className="absolute left-0 right-0 mt-2 bg-gradient-to-b from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_28px_rgba(234,179,8,0.12)] overflow-hidden z-50 max-h-[75vh] flex flex-col animate-in fade-in slide-in-from-top-2 duration-150">
           {/* Header count */}
-          <div className="px-4 py-2.5 border-b border-slate-800/80 bg-slate-950/60 flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="px-4 py-2.5 border-b border-yellow-500/25 bg-neutral-950/60 flex items-center justify-between text-xs">
+            <span className="font-semibold text-white flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
               <span>
                 {totalMatches === 0
                   ? 'Sin resultados'
                   : `${totalMatches} ${totalMatches === 1 ? 'evento encontrado' : 'eventos encontrados'}`}
               </span>
             </span>
-            <span className="text-[11px] text-slate-500">Filtrando por título y notas</span>
+            <span className="text-[11px] text-yellow-300/70">Filtrando por título y notas</span>
           </div>
 
           {/* Results list */}
-          <div className="overflow-y-auto p-2 space-y-3 divide-y divide-slate-800/50">
+          <div className="overflow-y-auto p-2 space-y-3 divide-y divide-yellow-500/10">
             {totalMatches === 0 ? (
               <div className="py-8 text-center px-4">
-                <Search className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-slate-300">
+                <Search className="w-8 h-8 text-yellow-400/40 mx-auto mb-2" />
+                <p className="text-xs font-semibold text-white">
                   No se encontraron citas con "{searchQuery}"
                 </p>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-yellow-300/70 mt-1">
                   Prueba buscando por asignatura (ej. Romano, Civil), tipo de examen, aula o profesor.
                 </p>
               </div>
@@ -232,8 +232,8 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
                 {/* Upcoming / Future events */}
                 {upcomingMatches.length > 0 && (
                   <div className="pt-1 space-y-1.5">
-                    <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                      <CalendarDays className="w-3.5 h-3.5" />
+                    <div className="px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-yellow-400 flex items-center gap-1.5">
+                      <CalendarDays className="w-3.5 h-3.5 text-yellow-400" />
                       <span>Próximas Citas y Futuras ({upcomingMatches.length})</span>
                     </div>
 
@@ -245,43 +245,43 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
                         <div
                           key={ev.id}
                           onClick={() => handleSelect(ev)}
-                          className="group p-2.5 rounded-xl bg-slate-950/50 hover:bg-slate-800/80 border border-slate-800/80 hover:border-indigo-500/50 transition-all cursor-pointer flex items-start justify-between gap-3"
+                          className="group p-2.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-800/90 border border-yellow-500/20 hover:border-yellow-500/50 transition-all cursor-pointer flex items-start justify-between gap-3"
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span
                                 className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
-                                style={{ backgroundColor: ev.color || '#6366f1' }}
+                                style={{ backgroundColor: ev.color || '#eab308' }}
                               />
-                              <span className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors truncate">
+                              <span className="text-xs font-bold text-white group-hover:text-yellow-300 transition-colors truncate">
                                 {highlightMatch(ev.title, searchQuery)}
                               </span>
                               {ev.category && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700/80">
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-900 text-yellow-300 border border-yellow-500/30">
                                   {highlightMatch(ev.category, searchQuery)}
                                 </span>
                               )}
                               {badge && (
-                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-black shadow-xs">
                                   {badge}
                                 </span>
                               )}
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
-                              <span className="flex items-center gap-1 font-medium text-slate-300">
-                                <Calendar className="w-3 h-3 text-slate-500" />
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-300">
+                              <span className="flex items-center gap-1 font-medium text-white">
+                                <Calendar className="w-3 h-3 text-yellow-400" />
                                 <span>{formatted}</span>
                               </span>
                               {timeStr && (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-500" />
+                                <span className="flex items-center gap-1 text-slate-300">
+                                  <Clock className="w-3 h-3 text-yellow-400" />
                                   <span>{timeStr}</span>
                                 </span>
                               )}
                               {ev.location && (
-                                <span className="flex items-center gap-1 text-slate-400 truncate max-w-xs">
-                                  <MapPin className="w-3 h-3 text-rose-400 shrink-0" />
+                                <span className="flex items-center gap-1 text-yellow-300/80 truncate max-w-xs">
+                                  <MapPin className="w-3 h-3 text-yellow-400 shrink-0" />
                                   <span className="truncate">{highlightMatch(ev.location, searchQuery)}</span>
                                 </span>
                               )}
@@ -294,7 +294,7 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
                             )}
                           </div>
 
-                          <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400">
+                          <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-yellow-400">
                             <ArrowRight className="w-4 h-4" />
                           </div>
                         </div>
@@ -306,7 +306,7 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
                 {/* Past events / History */}
                 {pastMatches.length > 0 && (
                   <div className="pt-2 space-y-1.5">
-                    <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <div className="px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                       <History className="w-3.5 h-3.5" />
                       <span>Citas Pasadas e Historial ({pastMatches.length})</span>
                     </div>
@@ -319,56 +319,56 @@ export function EventSearchBar({ onSelectEvent, onNavigateToDate }: EventSearchB
                         <div
                           key={ev.id}
                           onClick={() => handleSelect(ev)}
-                          className="group p-2.5 rounded-xl bg-slate-950/30 hover:bg-slate-800/70 border border-slate-800/60 hover:border-slate-700 transition-all cursor-pointer flex items-start justify-between gap-3 opacity-90 hover:opacity-100"
+                          className="group p-2.5 rounded-xl bg-neutral-900/40 hover:bg-neutral-800/70 border border-neutral-800 hover:border-yellow-500/30 transition-all cursor-pointer flex items-start justify-between gap-3 opacity-90 hover:opacity-100"
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span
                                 className="w-2.5 h-2.5 rounded-full shrink-0 opacity-80"
-                                style={{ backgroundColor: ev.color || '#6366f1' }}
+                                style={{ backgroundColor: ev.color || '#eab308' }}
                               />
                               <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors truncate">
                                 {highlightMatch(ev.title, searchQuery)}
                               </span>
                               {ev.category && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-400 border border-slate-800">
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-900 text-slate-400 border border-neutral-800">
                                   {highlightMatch(ev.category, searchQuery)}
                                 </span>
                               )}
                               {badge && (
-                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700/60">
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-900 text-slate-400 border border-neutral-700/60">
                                   {badge}
                                 </span>
                               )}
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
                               <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3 text-slate-600" />
+                                <Calendar className="w-3 h-3 text-slate-500" />
                                 <span>{formatted}</span>
                               </span>
                               {timeStr && (
                                 <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-600" />
+                                  <Clock className="w-3 h-3 text-slate-500" />
                                   <span>{timeStr}</span>
                                 </span>
                               )}
                               {ev.location && (
-                                <span className="flex items-center gap-1 text-slate-500 truncate max-w-xs">
-                                  <MapPin className="w-3 h-3 text-slate-600 shrink-0" />
+                                <span className="flex items-center gap-1 text-slate-400 truncate max-w-xs">
+                                  <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
                                   <span className="truncate">{highlightMatch(ev.location, searchQuery)}</span>
                                 </span>
                               )}
                             </div>
 
                             {ev.description && (
-                              <p className="text-[11px] text-slate-500 mt-1 line-clamp-1 italic">
+                              <p className="text-[11px] text-slate-400 mt-1 line-clamp-1 italic">
                                 {highlightMatch(ev.description, searchQuery)}
                               </p>
                             )}
                           </div>
 
-                          <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-slate-400">
+                          <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-yellow-400">
                             <ArrowRight className="w-4 h-4" />
                           </div>
                         </div>

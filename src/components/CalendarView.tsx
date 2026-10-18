@@ -39,7 +39,9 @@ export function CalendarView({
   const { filteredEvents, updateEvent, selectedCategory, setSelectedCategory, allCategories, loading } = useCalendar();
   const calendarRef = useRef<FullCalendar | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [activeView, setActiveView] = useState('dayGridMonth');
   const [previewDate, setPreviewDate] = useState<string | null>(null);
+  const isPeekingRef = useRef(false);
 
   // Navigate to target date when triggered from search or widget
   useEffect(() => {
@@ -56,8 +58,8 @@ export function CalendarView({
       start: ev.start,
       end: ev.end,
       allDay: ev.allDay,
-      backgroundColor: ev.color || '#6366f1',
-      borderColor: ev.color || '#6366f1',
+      backgroundColor: ev.color || '#eab308',
+      borderColor: ev.color || '#eab308',
       textColor: '#ffffff',
       extendedProps: {
         description: ev.description,
@@ -70,10 +72,12 @@ export function CalendarView({
 
   // Handlers for FullCalendar actions
   const handleDateClick = (arg: { dateStr: string; allDay: boolean }) => {
+    if (isPeekingRef.current) return;
     onSelectDate(arg.dateStr, arg.allDay);
   };
 
   const handleEventClick = (clickInfo: any) => {
+    if (isPeekingRef.current) return;
     const rawId = clickInfo.event.id;
     const found = filteredEvents.find((e) => e.id === rawId);
     if (found) {
@@ -132,18 +136,20 @@ export function CalendarView({
 
   const handleChangeView = (viewName: string) => {
     calendarRef.current?.getApi().changeView(viewName);
+    setActiveView(viewName);
   };
 
-  // 1-Second Desktop Hover & Mobile Long-Press Day Preview Pop-up
+  // 1-Second Desktop (Mouse Click Hold) & Mobile (Touch Hold) Preview Pop-up
+  // Pop-up disappears immediately when releasing click or lifting finger!
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let hoverTimer: any = null;
+    let holdTimer: any = null;
     let hoveredDate: string | null = null;
-    let touchTimer: any = null;
     let touchStartX = 0;
     let touchStartY = 0;
+    let isMouseDown = false;
 
     const extractDateFromEl = (target: HTMLElement | null): string | null => {
       if (!target) return null;
@@ -164,37 +170,76 @@ export function CalendarView({
       return null;
     };
 
-    // Desktop hover: exactly 1 second (1000ms) uninterrupted delay
-    const handleMouseMove = (e: MouseEvent) => {
+    const triggerPreview = (dateStr: string) => {
+      isPeekingRef.current = true;
+      setPreviewDate(dateStr);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try {
+          navigator.vibrate([40, 50, 40]);
+        } catch {}
+      }
+    };
+
+    const closePreviewIfPeeking = () => {
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      if (isPeekingRef.current || previewDate) {
+        setPreviewDate(null);
+        // Retain isPeekingRef briefly so synthesized click on release doesn't open edit modal
+        setTimeout(() => {
+          isPeekingRef.current = false;
+        }, 300);
+      }
+    };
+
+    // Desktop: mousedown (hold click 1 second to preview)
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return; // Only left click
+      isMouseDown = true;
       const target = e.target as HTMLElement;
       const dateStr = extractDateFromEl(target);
+      if (!dateStr) return;
 
-      if (!dateStr) {
-        if (hoveredDate) {
-          clearTimeout(hoverTimer);
-          hoveredDate = null;
-        }
-        return;
-      }
-
-      // If moving inside the same day cell or event, keep existing timer running!
-      if (hoveredDate === dateStr) {
-        return;
-      }
-
-      clearTimeout(hoverTimer);
       hoveredDate = dateStr;
-      hoverTimer = setTimeout(() => {
-        setPreviewDate(dateStr);
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => {
+        if (isMouseDown) {
+          triggerPreview(dateStr);
+        }
       }, 1000);
     };
 
-    const handleMouseLeave = () => {
-      clearTimeout(hoverTimer);
-      hoveredDate = null;
+    // Desktop hover while holding click
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isMouseDown) return;
+      const target = e.target as HTMLElement;
+      const dateStr = extractDateFromEl(target);
+
+      if (!dateStr || dateStr !== hoveredDate) {
+        if (holdTimer) clearTimeout(holdTimer);
+        hoveredDate = dateStr;
+        if (dateStr) {
+          holdTimer = setTimeout(() => {
+            if (isMouseDown) {
+              triggerPreview(dateStr);
+            }
+          }, 1000);
+        } else {
+          closePreviewIfPeeking();
+        }
+      }
     };
 
-    // Mobile touch: long press (touch & hold for 500ms with haptic vibration)
+    const handleMouseLeave = () => {
+      if (holdTimer) clearTimeout(holdTimer);
+      hoveredDate = null;
+      isMouseDown = false;
+      closePreviewIfPeeking();
+    };
+
+    // Mobile touchstart: hold finger 1 second (1000ms) to preview
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const touch = e.touches[0];
@@ -205,49 +250,59 @@ export function CalendarView({
       const dateStr = extractDateFromEl(target);
       if (!dateStr) return;
 
-      clearTimeout(touchTimer);
-      touchTimer = setTimeout(() => {
-        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-          try {
-            navigator.vibrate([35, 45, 35]);
-          } catch {}
-        }
-        setPreviewDate(dateStr);
-      }, 500);
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => {
+        triggerPreview(dateStr);
+      }, 1000);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!touchTimer) return;
+      if (!holdTimer && !isPeekingRef.current) return;
       const touch = e.touches[0];
       const diffX = Math.abs(touch.clientX - touchStartX);
       const diffY = Math.abs(touch.clientY - touchStartY);
-      if (diffX > 10 || diffY > 10) {
-        clearTimeout(touchTimer);
-        touchTimer = null;
+      if (diffX > 16 || diffY > 16) {
+        if (holdTimer) clearTimeout(holdTimer);
+        holdTimer = null;
+        closePreviewIfPeeking();
       }
     };
 
-    const handleTouchEnd = () => {
-      clearTimeout(touchTimer);
-      touchTimer = null;
+    // GLOBAL RELEASE LISTENERS:
+    // When the user releases the click (mouseup/pointerup) or lifts finger (touchend/touchcancel)
+    // anywhere, the preview pop up immediately disappears!
+    const handleGlobalRelease = () => {
+      isMouseDown = false;
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      closePreviewIfPeeking();
     };
 
+    container.addEventListener('mousedown', handleMouseDown);
     container.addEventListener('mousemove', handleMouseMove);
     container.addEventListener('mouseleave', handleMouseLeave);
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: true });
-    container.addEventListener('touchend', handleTouchEnd);
-    container.addEventListener('touchcancel', handleTouchEnd);
+
+    window.addEventListener('mouseup', handleGlobalRelease, { capture: true });
+    window.addEventListener('pointerup', handleGlobalRelease, { capture: true });
+    window.addEventListener('touchend', handleGlobalRelease, { capture: true });
+    window.addEventListener('touchcancel', handleGlobalRelease, { capture: true });
 
     return () => {
-      clearTimeout(hoverTimer);
-      clearTimeout(touchTimer);
+      if (holdTimer) clearTimeout(holdTimer);
+      container.removeEventListener('mousedown', handleMouseDown);
       container.removeEventListener('mousemove', handleMouseMove);
       container.removeEventListener('mouseleave', handleMouseLeave);
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
-      container.removeEventListener('touchcancel', handleTouchEnd);
+
+      window.removeEventListener('mouseup', handleGlobalRelease, { capture: true });
+      window.removeEventListener('pointerup', handleGlobalRelease, { capture: true });
+      window.removeEventListener('touchend', handleGlobalRelease, { capture: true });
+      window.removeEventListener('touchcancel', handleGlobalRelease, { capture: true });
     };
   }, []);
 
@@ -264,16 +319,15 @@ export function CalendarView({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Category Filter Pills & Metrics */}
-      {/* Category filter strip + quick stats */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-black border border-yellow-500/25 p-3 rounded-2xl">
+      {/* Category filter strip + quick stats with HUD aesthetic */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-3 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)]">
         <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
               selectedCategory === 'all'
-                ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-sm'
-                : 'bg-neutral-900 text-yellow-400/80 border-neutral-800 hover:text-white'
+                ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                : 'bg-neutral-800/80 text-yellow-400/80 border-yellow-500/30 hover:text-white hover:bg-neutral-700/80'
             }`}
           >
             Todas ({filteredEvents.length})
@@ -285,8 +339,8 @@ export function CalendarView({
               onClick={() => setSelectedCategory(cat.name)}
               className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer border ${
                 selectedCategory === cat.name
-                  ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-sm'
-                  : 'bg-neutral-900 text-slate-300 border-neutral-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                  : 'bg-neutral-800/80 text-slate-300 border-neutral-700 hover:text-white hover:bg-neutral-700/80'
               }`}
             >
               <span
@@ -301,7 +355,7 @@ export function CalendarView({
             <button
               onClick={onOpenCategoryManager}
               title="Gestionar y crear categorías personalizadas"
-              className="px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-neutral-900 hover:bg-neutral-800 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-400 hover:text-white border border-yellow-500/30"
             >
               <span>+ Categoría</span>
             </button>
@@ -309,20 +363,20 @@ export function CalendarView({
         </div>
 
         {/* Quick stats badge */}
-        <div className="flex items-center gap-3 shrink-0 text-xs text-slate-400 self-end sm:self-center">
-          <div className="flex items-center gap-1 bg-neutral-900 px-2.5 py-1 rounded-lg border border-yellow-500/20">
+        <div className="flex items-center gap-3 shrink-0 text-xs text-slate-300 self-end sm:self-center">
+          <div className="flex items-center gap-1.5 bg-neutral-800/80 px-2.5 py-1 rounded-xl border border-yellow-500/30 shadow-inner">
             <Clock className="w-3.5 h-3.5 text-yellow-400" />
             <span>Hoy: <strong className="text-white">{stats.today}</strong></span>
           </div>
-          <div className="flex items-center gap-1 bg-neutral-900 px-2.5 py-1 rounded-lg border border-yellow-500/20">
+          <div className="flex items-center gap-1.5 bg-neutral-800/80 px-2.5 py-1 rounded-xl border border-yellow-500/30 shadow-inner">
             <CalendarIcon className="w-3.5 h-3.5 text-yellow-400" />
             <span>Total: <strong className="text-white">{stats.total}</strong></span>
           </div>
         </div>
       </div>
 
-      {/* Main FullCalendar Card */}
-      <div className="bg-black border border-yellow-500/30 rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/80 relative overflow-hidden">
+      {/* Main FullCalendar Card with HUD Aesthetic */}
+      <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl p-4 sm:p-6 shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)] relative overflow-hidden">
         {loading && (
           <div className="absolute inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-20">
             <div className="flex items-center gap-2.5 text-yellow-400 text-sm font-semibold bg-neutral-900 px-4 py-2 rounded-xl border border-yellow-500/30 shadow-lg">
@@ -332,27 +386,27 @@ export function CalendarView({
           </div>
         )}
 
-        {/* Calendar custom bar */}
+        {/* Calendar custom bar with HUD aesthetic */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
             <button
               onClick={handleToday}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-900 hover:bg-neutral-800 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-neutral-900/80 hover:bg-neutral-800 text-yellow-400 hover:text-white border border-yellow-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
             >
               Hoy
             </button>
-            <div className="flex items-center bg-neutral-900 rounded-xl border border-yellow-500/20 p-0.5">
+            <div className="flex items-center bg-neutral-900/80 rounded-xl border border-yellow-500/25 p-0.5 backdrop-blur-sm">
               <button
                 onClick={handlePrev}
                 aria-label="Mes anterior"
-                className="p-1 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNext}
                 aria-label="Mes siguiente"
-                className="p-1 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -362,7 +416,7 @@ export function CalendarView({
               <button
                 onClick={onOpenImageScanner}
                 title="Pegar o subir foto de un horario o cuadrante para añadirlo con IA"
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-900 hover:bg-neutral-800 border border-yellow-500/40 text-yellow-400 hover:text-yellow-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-neutral-900/80 hover:bg-neutral-800 border border-yellow-500/40 text-yellow-400 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
               >
                 <Camera className="w-3.5 h-3.5 text-yellow-400" />
                 <span>Pegar Horario (Foto)</span>
@@ -370,29 +424,45 @@ export function CalendarView({
             )}
           </div>
 
-          {/* View Mode Buttons */}
-          <div className="flex items-center bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+          {/* View Mode Buttons with HUD aesthetic */}
+          <div className="flex items-center bg-neutral-900/80 p-1 rounded-xl border border-yellow-500/25 text-xs font-medium backdrop-blur-sm">
             <button
               onClick={() => handleChangeView('dayGridMonth')}
-              className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                activeView === 'dayGridMonth'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
+              }`}
             >
               Mes
             </button>
             <button
               onClick={() => handleChangeView('timeGridWeek')}
-              className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                activeView === 'timeGridWeek'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
+              }`}
             >
               Semana
             </button>
             <button
               onClick={() => handleChangeView('timeGridDay')}
-              className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                activeView === 'timeGridDay'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
+              }`}
             >
               Día
             </button>
             <button
               onClick={() => handleChangeView('listWeek')}
-              className="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                activeView === 'listWeek'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
+              }`}
             >
               Vertical
             </button>
@@ -420,20 +490,6 @@ export function CalendarView({
             events={calendarEvents}
             dateClick={handleDateClick}
             eventClick={handleEventClick}
-            eventMouseEnter={(info: any) => {
-              const d = info.event.startStr ? info.event.startStr.split('T')[0] : null;
-              if (d) {
-                const timer = setTimeout(() => {
-                  setPreviewDate(d);
-                }, 1000);
-                (info.el as any)._previewTimer = timer;
-              }
-            }}
-            eventMouseLeave={(info: any) => {
-              if ((info.el as any)._previewTimer) {
-                clearTimeout((info.el as any)._previewTimer);
-              }
-            }}
             eventDrop={handleEventDrop}
             eventResize={handleEventResize}
             height="auto"

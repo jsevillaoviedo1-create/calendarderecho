@@ -153,21 +153,23 @@ Reglas:
         try {
           const response = await ai.models.generateContent({
             model,
-            contents: {
-              parts: [
-                {
-                  inlineData: {
-                    mimeType: detectedMime || 'image/jpeg',
-                    data: cleanBase64,
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: detectedMime || 'image/jpeg',
+                      data: cleanBase64,
+                    },
                   },
-                },
-                {
-                  text: 'Extrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.',
-                },
-              ],
-            },
+                  {
+                    text: `${systemPrompt}\n\nExtrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.`,
+                  },
+                ],
+              },
+            ],
             config: {
-              systemInstruction: systemPrompt,
               temperature: 0.1,
               responseMimeType: 'application/json',
               responseSchema: {
@@ -210,6 +212,13 @@ Reglas:
   }
 
   if (serverErrorMessage) {
+    // If error contains raw JSON error, extract a clean readable explanation
+    try {
+      const parsed = JSON.parse(serverErrorMessage);
+      if (parsed?.error?.message) {
+        throw new Error(`Error de IA: ${parsed.error.message}`);
+      }
+    } catch {}
     throw new Error(serverErrorMessage);
   }
 

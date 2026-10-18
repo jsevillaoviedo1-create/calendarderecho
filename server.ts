@@ -112,12 +112,11 @@ Reglas:
                 },
               },
               {
-                text: 'Extrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.',
+                text: `${systemPrompt}\n\nExtrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.`,
               },
             ],
           }],
           config: {
-            systemInstruction: systemPrompt,
             temperature: 0.1,
             responseMimeType: 'application/json',
             responseSchema: {
@@ -165,8 +164,15 @@ Reglas:
     return res.json(parsed);
   } catch (error: any) {
     console.error('Error en /api/ai/parse-schedule-image:', error);
+    let errMsg = error?.message || 'Error al procesar la imagen del horario con IA';
+    try {
+      const parsedErr = JSON.parse(errMsg);
+      if (parsedErr?.error?.message) {
+        errMsg = parsedErr.error.message;
+      }
+    } catch {}
     return res.status(500).json({
-      error: error?.message || 'Error al procesar la imagen del horario con IA',
+      error: errMsg,
     });
   }
 });

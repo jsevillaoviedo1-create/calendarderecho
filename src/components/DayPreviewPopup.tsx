@@ -11,10 +11,9 @@ import {
   CheckCircle2,
   Circle,
   X,
-  ExternalLink,
   Sparkles,
-  Tag,
   ArrowRight,
+  Hand,
 } from 'lucide-react';
 
 interface DayPreviewPopupProps {
@@ -46,6 +45,22 @@ export function DayPreviewPopup({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Instantly close peek preview when releasing mouse click or lifting finger anywhere!
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleRelease = () => {
+      onClose();
+    };
+    window.addEventListener('mouseup', handleRelease, { capture: true });
+    window.addEventListener('touchend', handleRelease, { capture: true });
+    window.addEventListener('pointerup', handleRelease, { capture: true });
+    return () => {
+      window.removeEventListener('mouseup', handleRelease, { capture: true });
+      window.removeEventListener('touchend', handleRelease, { capture: true });
+      window.removeEventListener('pointerup', handleRelease, { capture: true });
+    };
   }, [isOpen, onClose]);
 
   // Events for that date
@@ -95,7 +110,7 @@ export function DayPreviewPopup({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -104,16 +119,16 @@ export function DayPreviewPopup({
         ref={popupRef}
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-lg bg-black border border-yellow-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] animate-in zoom-in-95 duration-150 relative text-white"
+        className="w-full max-w-lg bg-gradient-to-b from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_30px_rgba(234,179,8,0.15)] overflow-hidden flex flex-col max-h-[88vh] animate-in zoom-in-95 duration-150 relative text-white backdrop-blur-2xl"
       >
         {/* Glow ambient effects */}
-        <div className="absolute -top-12 -right-12 w-36 h-36 bg-yellow-400/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-yellow-400/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-36 h-36 bg-yellow-400/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-yellow-400/15 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-neutral-800 bg-zinc-950/95 flex items-center justify-between shrink-0 z-10">
+        {/* Header with HUD Aesthetic */}
+        <div className="px-5 py-4 border-b border-yellow-500/25 bg-neutral-950/70 flex items-center justify-between shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center text-black shadow-md shadow-yellow-400/30 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 flex items-center justify-center text-black shadow-md shadow-yellow-400/35 shrink-0">
               <CalendarIcon className="w-5 h-5 text-black" />
             </div>
             <div className="min-w-0">
@@ -122,11 +137,11 @@ export function DayPreviewPopup({
                   {formattedHeader.weekday}
                 </h3>
                 {formattedHeader.isToday && (
-                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-black shrink-0">
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-yellow-400 text-black shrink-0 shadow-xs">
                     HOY
                   </span>
                 )}
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-500/30 shrink-0 hidden sm:inline">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-500/35 shrink-0 hidden sm:inline">
                   VISTA PREVIA
                 </span>
               </div>
@@ -136,42 +151,53 @@ export function DayPreviewPopup({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            title="Cerrar vista previa (Esc)"
-            className="text-yellow-400/70 hover:text-white p-2 rounded-xl hover:bg-neutral-900 border border-transparent hover:border-yellow-500/30 transition-colors cursor-pointer shrink-0 ml-2"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0 ml-2">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-yellow-300 bg-neutral-800/90 px-2.5 py-1 rounded-xl border border-yellow-500/35 shadow-inner">
+              <Hand className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
+              <span>Suelta para cerrar</span>
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              title="Cerrar vista previa (Esc)"
+              className="text-yellow-400/70 hover:text-white p-2 rounded-xl hover:bg-neutral-800 border border-transparent hover:border-yellow-500/30 transition-colors cursor-pointer shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 relative z-10">
-          {/* Summary badge row */}
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-            <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
-            <span>
-              Total en este día:{' '}
-              <strong className="text-white">
-                {dayEvents.length} {dayEvents.length === 1 ? 'evento' : 'eventos'}
-              </strong>{' '}
-              y{' '}
-              <strong className="text-white">
-                {dayTasks.length} {dayTasks.length === 1 ? 'tarea' : 'tareas'}
-              </strong>
+          {/* Summary badge row with HUD aesthetic */}
+          <div className="flex items-center justify-between gap-2 text-xs text-yellow-300/90 bg-neutral-800/80 p-2.5 rounded-xl border border-yellow-500/35 shadow-inner backdrop-blur-md">
+            <div className="flex items-center gap-2 min-w-0 truncate">
+              <Sparkles className="w-4 h-4 text-yellow-400 shrink-0" />
+              <span className="truncate">
+                Total:{' '}
+                <strong className="text-white">
+                  {dayEvents.length} {dayEvents.length === 1 ? 'evento' : 'eventos'}
+                </strong>{' '}
+                y{' '}
+                <strong className="text-white">
+                  {dayTasks.length} {dayTasks.length === 1 ? 'tarea' : 'tareas'}
+                </strong>
+              </span>
+            </div>
+            <span className="text-[10px] text-yellow-400/70 sm:hidden shrink-0">
+              Suelta para salir
             </span>
           </div>
 
           {/* Events list */}
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5 mb-2">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-yellow-400 flex items-center gap-1.5 mb-2">
               <CalendarIcon className="w-3.5 h-3.5" />
               <span>Eventos del Calendario ({dayEvents.length})</span>
             </div>
 
             {dayEvents.length === 0 ? (
-              <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 text-center text-xs text-slate-500">
+              <div className="p-4 rounded-2xl bg-neutral-900/40 border border-neutral-800 text-center text-xs text-slate-400">
                 No hay eventos programados para este día.
               </div>
             ) : (
@@ -201,32 +227,32 @@ export function DayPreviewPopup({
                         onClose();
                         onSelectEvent(ev);
                       }}
-                      className="group p-3 rounded-2xl bg-slate-950/70 hover:bg-slate-800/80 border border-slate-800/80 hover:border-indigo-500/50 transition-all cursor-pointer flex items-start justify-between gap-3"
+                      className="group p-3 rounded-2xl bg-neutral-900/60 hover:bg-neutral-800/90 border border-yellow-500/20 hover:border-yellow-500/50 transition-all cursor-pointer flex items-start justify-between gap-3"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span
                             className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
-                            style={{ backgroundColor: ev.color || '#6366f1' }}
+                            style={{ backgroundColor: ev.color || '#eab308' }}
                           />
-                          <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition-colors truncate">
+                          <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-yellow-300 transition-colors truncate">
                             {ev.title}
                           </h4>
                           {ev.category && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/60">
+                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-900 text-yellow-300 border border-yellow-500/30">
                               {ev.category}
                             </span>
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
-                          <span className="flex items-center gap-1 font-semibold text-slate-300">
-                            <Clock className="w-3 h-3 text-indigo-400" />
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-300">
+                          <span className="flex items-center gap-1 font-semibold text-white">
+                            <Clock className="w-3 h-3 text-yellow-400" />
                             <span>{timeStr}</span>
                           </span>
                           {ev.location && (
-                            <span className="flex items-center gap-1 text-slate-400 truncate max-w-xs">
-                              <MapPin className="w-3 h-3 text-rose-400 shrink-0" />
+                            <span className="flex items-center gap-1 text-yellow-300/80 truncate max-w-xs">
+                              <MapPin className="w-3 h-3 text-yellow-400 shrink-0" />
                               <span className="truncate">{ev.location}</span>
                             </span>
                           )}
@@ -239,7 +265,7 @@ export function DayPreviewPopup({
                         )}
                       </div>
 
-                      <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400">
+                      <div className="shrink-0 self-center opacity-0 group-hover:opacity-100 transition-opacity text-yellow-400">
                         <ArrowRight className="w-4 h-4" />
                       </div>
                     </div>
@@ -251,13 +277,13 @@ export function DayPreviewPopup({
 
           {/* Agenda tasks list */}
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-2">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-yellow-400 flex items-center gap-1.5 mb-2">
               <BookOpen className="w-3.5 h-3.5" />
               <span>Tareas y Asignaturas de la Agenda ({dayTasks.length})</span>
             </div>
 
             {dayTasks.length === 0 ? (
-              <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 text-center text-xs text-slate-500">
+              <div className="p-4 rounded-2xl bg-neutral-900/40 border border-neutral-800 text-center text-xs text-slate-400">
                 No hay tareas asignadas en la agenda para este día.
               </div>
             ) : (
@@ -268,23 +294,23 @@ export function DayPreviewPopup({
                     onClick={() => toggleTaskCompleted(tk.id)}
                     className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
                       tk.completed
-                        ? 'bg-emerald-950/20 border-emerald-500/20 text-slate-400'
-                        : 'bg-slate-950/70 border-slate-800 hover:border-emerald-500/40 text-white'
+                        ? 'bg-neutral-900/30 border-neutral-800 text-slate-500'
+                        : 'bg-neutral-900/60 border-yellow-500/20 hover:border-yellow-500/40 text-white'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <button
                         type="button"
-                        className="shrink-0 text-emerald-400"
+                        className="shrink-0 text-yellow-400"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleTaskCompleted(tk.id);
                         }}
                       >
                         {tk.completed ? (
-                          <CheckCircle2 className="w-4 h-4 fill-emerald-500 text-slate-900" />
+                          <CheckCircle2 className="w-4 h-4 fill-yellow-400 text-black" />
                         ) : (
-                          <Circle className="w-4 h-4 text-slate-500 hover:text-emerald-400" />
+                          <Circle className="w-4 h-4 text-yellow-400/70 hover:text-yellow-400" />
                         )}
                       </button>
                       <div className="min-w-0">
@@ -303,7 +329,7 @@ export function DayPreviewPopup({
                     </div>
 
                     {tk.priority === 'urgente' && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 shrink-0">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 shrink-0">
                         Urgente
                       </span>
                     )}
@@ -315,11 +341,11 @@ export function DayPreviewPopup({
         </div>
 
         {/* Sticky Action Footer */}
-        <div className="px-5 py-3.5 border-t border-neutral-800 bg-zinc-950/95 flex flex-wrap items-center justify-between gap-2.5 shrink-0 z-10">
+        <div className="px-5 py-3.5 border-t border-yellow-500/20 bg-neutral-900/90 flex flex-wrap items-center justify-between gap-2.5 shrink-0 z-10">
           <button
             type="button"
             onClick={onClose}
-            className="px-3.5 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-xl hover:bg-neutral-900 transition-colors cursor-pointer"
+            className="px-3.5 py-2 text-xs font-bold text-yellow-400/80 hover:text-white rounded-xl hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             Cerrar
           </button>
@@ -331,7 +357,7 @@ export function DayPreviewPopup({
                 onClose();
                 onOpenNewTask(dateStr);
               }}
-              className="px-3.5 py-2 text-xs font-bold bg-neutral-900 hover:bg-neutral-800 text-yellow-400 border border-yellow-500/30 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-2 text-xs font-bold bg-neutral-900 hover:bg-neutral-800 text-yellow-400 hover:text-white border border-yellow-500/30 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
             >
               <BookOpen className="w-3.5 h-3.5 text-yellow-400" />
               <span>+ Tarea</span>
@@ -343,7 +369,7 @@ export function DayPreviewPopup({
                 onClose();
                 onOpenNewEvent(dateStr);
               }}
-              className="px-4 py-2 text-xs font-extrabold bg-yellow-400 hover:bg-yellow-300 text-black rounded-xl shadow-md shadow-yellow-400/25 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 text-xs font-extrabold bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-black rounded-xl shadow-md shadow-yellow-400/25 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 text-black stroke-[3]" />
               <span>+ Evento</span>

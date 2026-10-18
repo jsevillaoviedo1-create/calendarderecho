@@ -255,20 +255,20 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         </div>
       )}
 
-      {/* Top Header Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Top Header Card with HUD Aesthetic */}
+      <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl p-4 sm:p-5 shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 shrink-0">
-            <BookOpen className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-yellow-400 to-amber-400 flex items-center justify-center text-black shadow-lg shadow-yellow-400/25 shrink-0">
+            <BookOpen className="w-6 h-6 text-black" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-white tracking-tight">Agenda Día a Día</h2>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <h2 className="text-xl font-extrabold text-white tracking-tight">Agenda Día a Día</h2>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-500/30">
                 Grado en Derecho
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5 capitalize">
+            <p className="text-xs text-yellow-300/80 mt-0.5 capitalize font-medium">
               {friendlyDate}
             </p>
           </div>
@@ -276,13 +276,13 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
 
         {/* View Mode Switcher & New Task Button */}
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-          <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+          <div className="flex items-center bg-neutral-900/80 p-1 rounded-xl border border-yellow-500/25 text-xs font-medium backdrop-blur-sm">
             <button
               onClick={() => setViewMode('day')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'day'
-                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
               }`}
             >
               Día a Día
@@ -291,8 +291,8 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setViewMode('week')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'week'
-                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
               }`}
             >
               Semana (Lun-Dom)
@@ -301,8 +301,8 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setViewMode('all')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 viewMode === 'all'
-                  ? 'bg-amber-600 text-white font-semibold shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-sm'
+                  : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800'
               }`}
             >
               Todas
@@ -313,9 +313,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             <button
               onClick={onOpenImageScanner}
               title="Pegar o subir foto de un horario o cuadrante para añadir tareas con IA"
-              className="py-2 px-3 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/20 via-purple-500/20 to-pink-500/20 hover:from-amber-500/30 hover:to-purple-500/30 border border-amber-500/40 text-amber-300 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+              className="py-2 px-3 rounded-xl text-xs font-extrabold bg-neutral-900/80 hover:bg-neutral-800 border border-yellow-500/40 text-yellow-400 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
             >
-              <Camera className="w-4 h-4 text-amber-400" />
+              <Camera className="w-4 h-4 text-yellow-400" />
               <span className="hidden sm:inline">Pegar Horario (Foto)</span>
             </button>
           )}
@@ -325,58 +325,58 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               setEditingTask(null);
               setModalOpen(true);
             }}
-            className="py-2 px-3.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white shadow-md shadow-amber-600/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="py-2 px-3.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-black shadow-md shadow-yellow-400/25 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-black stroke-[3]" />
             <span>Nueva Tarea</span>
           </button>
         </div>
       </div>
 
-      {/* Date Navigation & Week Strip (Starts Monday, Ends Sunday) */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-md space-y-3">
+      {/* Date Navigation & Week Strip (Starts Monday, Ends Sunday) with HUD Aesthetic */}
+      <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl p-4 shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)] space-y-3">
         {/* Day Jump Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={handleSetToday}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                 selectedDate === todayStr
-                  ? 'bg-amber-600 text-white border-amber-500'
-                  : 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 shadow-sm'
+                  : 'bg-neutral-900/80 text-yellow-400/80 hover:text-white hover:bg-neutral-800 border-yellow-500/25'
               }`}
             >
               Hoy
             </button>
-            <div className="flex items-center bg-slate-800/80 rounded-xl border border-slate-700 p-0.5">
+            <div className="flex items-center bg-neutral-900/80 rounded-xl border border-yellow-500/25 p-0.5 backdrop-blur-sm">
               <button
                 onClick={handlePrevDay}
                 title="Día anterior"
-                className="p-1 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNextDay}
                 title="Día siguiente"
-                className="p-1 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                className="p-1.5 text-yellow-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-            <span className="text-xs font-semibold text-slate-200 capitalize hidden sm:inline ml-1">
+            <span className="text-xs font-bold text-white capitalize hidden sm:inline ml-1">
               {friendlyDate}
             </span>
           </div>
 
           {/* Direct Date Picker */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Ir a fecha:</span>
+            <span className="text-xs text-yellow-300/80 font-medium">Ir a fecha:</span>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="bg-neutral-900/90 border border-yellow-500/30 rounded-xl px-2.5 py-1 text-xs text-white focus:outline-none focus:ring-2 focus:ring-yellow-400/20"
             />
           </div>
         </div>
@@ -389,39 +389,33 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
               onClick={() => setSelectedDate(day.dateStr)}
               className={`p-2 rounded-xl text-center transition-all cursor-pointer border flex flex-col items-center gap-1 ${
                 day.isSelected
-                  ? 'bg-amber-600/30 border-amber-500 ring-2 ring-amber-500 shadow-md'
+                  ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-md'
                   : day.isToday
-                  ? 'bg-slate-800/90 border-slate-700 text-white'
-                  : 'bg-slate-950/40 border-slate-800/80 hover:bg-slate-800/60 text-slate-400 hover:text-slate-200'
+                  ? 'bg-neutral-900/90 border-yellow-500/40 text-yellow-400 font-bold'
+                  : 'bg-neutral-900/60 border-neutral-800 hover:bg-neutral-800/80 text-slate-300 hover:text-white'
               }`}
             >
-              <span className="text-[11px] font-medium uppercase tracking-wider block">
+              <span className={`text-[11px] font-bold uppercase tracking-wider block ${day.isSelected ? 'text-black' : 'text-slate-400'}`}>
                 {day.shortName}
               </span>
-              <span
-                className={`text-sm font-bold w-6 h-6 rounded-full flex items-center justify-center ${
-                  day.isSelected
-                    ? 'bg-amber-600 text-white'
-                    : day.isToday
-                    ? 'bg-amber-500/20 text-amber-300'
-                    : 'text-slate-200'
-                }`}
-              >
+              <span className={`text-xs font-bold block ${day.isSelected ? 'text-black' : 'text-white'}`}>
                 {day.dayNum}
               </span>
-              <div className="flex items-center gap-1 h-2">
+              <div className="flex items-center gap-1 mt-0.5">
                 {day.count > 0 ? (
                   <span
-                    className={`text-[9px] font-bold px-1 rounded-full ${
-                      day.completedCount === day.count
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    className={`text-[10px] font-bold px-1.5 rounded-full ${
+                      day.isSelected
+                        ? 'bg-black text-yellow-400'
+                        : day.completedCount === day.count
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-yellow-500/20 text-yellow-300'
                     }`}
                   >
                     {day.completedCount}/{day.count}
                   </span>
                 ) : (
-                  <span className="w-1 h-1 rounded-full bg-slate-800" />
+                  <span className={`w-1 h-1 rounded-full ${day.isSelected ? 'bg-black' : 'bg-neutral-800'}`} />
                 )}
               </div>
             </button>
@@ -429,13 +423,13 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         </div>
       </div>
 
-      {/* Filters & Search Toolbar */}
-      <div className="bg-slate-900/60 border border-slate-800 p-3.5 rounded-2xl flex flex-col gap-3">
+      {/* Filters & Search Toolbar with HUD Aesthetic */}
+      <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-3.5 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)] flex flex-col gap-3">
         {/* Semester selector */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
-            <span className="text-xs font-semibold text-slate-400 mr-1 flex items-center gap-1">
-              <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-xs font-semibold text-yellow-300/80 mr-1 flex items-center gap-1">
+              <GraduationCap className="w-3.5 h-3.5 text-yellow-400" />
               <span>Semestre:</span>
             </span>
             <button
@@ -443,10 +437,10 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 setSelectedSemester('all');
                 setSelectedSubject('all');
               }}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold cursor-pointer border transition-all ${
                 selectedSemester === 'all'
-                  ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
-                  : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                  : 'bg-neutral-900/80 text-yellow-400/80 border-yellow-500/25 hover:text-white hover:bg-neutral-800'
               }`}
             >
               Todos
@@ -456,10 +450,10 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 setSelectedSemester('1er semestre');
                 setSelectedSubject('all');
               }}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold cursor-pointer border transition-all ${
                 selectedSemester === '1er semestre'
-                  ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
-                  : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                  : 'bg-neutral-900/80 text-yellow-400/80 border-yellow-500/25 hover:text-white hover:bg-neutral-800'
               }`}
             >
               1er Semestre
@@ -469,10 +463,10 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 setSelectedSemester('2o semestre');
                 setSelectedSubject('all');
               }}
-              className={`px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border transition-all ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold cursor-pointer border transition-all ${
                 selectedSemester === '2o semestre'
-                  ? 'bg-yellow-600 text-white border-yellow-500 shadow-sm'
-                  : 'bg-slate-950/40 text-slate-400 border-slate-800 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
+                  : 'bg-neutral-900/80 text-yellow-400/80 border-yellow-500/25 hover:text-white hover:bg-neutral-800'
               }`}
             >
               2o Semestre
@@ -480,11 +474,11 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
           </div>
 
           {/* Status selector (all, pending, completed) */}
-          <div className="flex items-center bg-slate-950/80 p-0.5 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center bg-neutral-900/80 p-0.5 rounded-xl border border-yellow-500/25 text-xs backdrop-blur-sm">
             <button
               onClick={() => setStatusFilter('all')}
               className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                statusFilter === 'all' ? 'bg-slate-800 text-white font-medium' : 'text-slate-400'
+                statusFilter === 'all' ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-xs' : 'text-yellow-400/80 hover:text-white'
               }`}
             >
               Todas ({tasks.length})
@@ -492,7 +486,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             <button
               onClick={() => setStatusFilter('pending')}
               className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                statusFilter === 'pending' ? 'bg-slate-800 text-amber-300 font-medium' : 'text-slate-400'
+                statusFilter === 'pending' ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-xs' : 'text-yellow-400/80 hover:text-white'
               }`}
             >
               Pendientes
@@ -500,7 +494,7 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             <button
               onClick={() => setStatusFilter('completed')}
               className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                statusFilter === 'completed' ? 'bg-slate-800 text-emerald-300 font-medium' : 'text-slate-400'
+                statusFilter === 'completed' ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black font-extrabold shadow-xs' : 'text-yellow-400/80 hover:text-white'
               }`}
             >
               Completadas
@@ -509,14 +503,14 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         </div>
 
         {/* Subjects bar according to selected semester */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-800/60 overflow-x-auto scrollbar-none">
-          <span className="text-[11px] font-medium text-slate-500 mr-1">Asignatura:</span>
+        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-yellow-500/20 overflow-x-auto scrollbar-none">
+          <span className="text-[11px] font-semibold text-yellow-300/70 mr-1">Asignatura:</span>
           <button
             onClick={() => setSelectedSubject('all')}
-            className={`px-2.5 py-0.5 rounded-lg text-xs font-medium cursor-pointer border ${
+            className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold cursor-pointer border ${
               selectedSubject === 'all'
-                ? 'bg-slate-800 text-white border-slate-700'
-                : 'text-slate-400 border-transparent hover:bg-slate-800/40'
+                ? 'bg-yellow-400 text-black border-yellow-400 font-extrabold shadow-xs'
+                : 'text-yellow-400/80 border-transparent hover:bg-neutral-800 hover:text-white'
             }`}
           >
             Todas las asignaturas
@@ -529,8 +523,8 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 onClick={() => setSelectedSubject(sub)}
                 className={`px-2 py-0.5 rounded-lg text-xs font-medium cursor-pointer border transition-all ${
                   selectedSubject === sub
-                    ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 font-semibold'
-                    : 'text-slate-400 border-slate-800/60 hover:text-slate-200 hover:bg-slate-800/40'
+                    ? 'bg-yellow-400/20 text-yellow-300 border-yellow-500/40 font-bold'
+                    : 'text-slate-300 border-neutral-800 hover:text-white hover:bg-neutral-800/80'
                 }`}
               >
                 {sub}
@@ -544,8 +538,8 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 onClick={() => setSelectedSubject(sub)}
                 className={`px-2 py-0.5 rounded-lg text-xs font-medium cursor-pointer border transition-all ${
                   selectedSubject === sub
-                    ? 'bg-yellow-500/25 text-yellow-300 border-yellow-500/50 font-semibold'
-                    : 'text-slate-400 border-slate-800/60 hover:text-slate-200 hover:bg-slate-800/40'
+                    ? 'bg-yellow-400/20 text-yellow-300 border-yellow-500/40 font-bold'
+                    : 'text-slate-300 border-neutral-800 hover:text-white hover:bg-neutral-800/80'
                 }`}
               >
                 {sub}
@@ -554,21 +548,21 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
         </div>
       </div>
 
-      {/* Progress & Summary Banner */}
-      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+      {/* Progress & Summary Banner with HUD Aesthetic */}
+      <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)]">
         <div className="flex-1 w-full sm:w-auto">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-              <CheckSquare className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-bold text-white flex items-center gap-1.5">
+              <CheckSquare className="w-3.5 h-3.5 text-yellow-400" />
               <span>Progreso de estudio:</span>
             </span>
-            <span className="font-bold text-white">
+            <span className="font-extrabold text-yellow-400">
               {stats.completed} de {stats.total} completadas ({stats.percent}%)
             </span>
           </div>
-          <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+          <div className="w-full h-2 rounded-full bg-neutral-950 overflow-hidden border border-yellow-500/20">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-300"
+              className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full transition-all duration-300"
               style={{ width: `${stats.percent}%` }}
             />
           </div>
@@ -581,14 +575,14 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
             placeholder={`Añadir tarea rápida para ${selectedDate}...`}
             value={quickInput}
             onChange={(e) => setQuickInput(e.target.value)}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="flex-1 bg-neutral-900/90 border border-yellow-500/30 rounded-xl px-3 py-1.5 text-xs text-white placeholder-yellow-300/40 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"
           />
           <button
             type="submit"
             disabled={!quickInput.trim()}
-            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-50 transition-all shrink-0 active:scale-95 flex items-center gap-1"
+            className="px-3.5 py-1.5 bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-black rounded-xl text-xs font-extrabold cursor-pointer disabled:opacity-50 transition-all shrink-0 active:scale-95 flex items-center gap-1 shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-black stroke-[3]" />
             <span>Añadir</span>
           </button>
         </form>
@@ -597,11 +591,11 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
       {/* Task List */}
       <div className="space-y-2.5">
         {displayedTasks.length === 0 ? (
-          <div className="py-14 px-4 text-center rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 flex flex-col items-center justify-center">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
+          <div className="py-14 px-4 text-center rounded-2xl bg-neutral-900/40 border border-dashed border-yellow-500/30 flex flex-col items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-yellow-400/10 border border-yellow-500/30 text-yellow-400 flex items-center justify-center mb-3">
               <ListTodo className="w-6 h-6" />
             </div>
-            <h4 className="text-sm font-semibold text-white">No hay tareas para este criterio</h4>
+            <h4 className="text-sm font-bold text-white">No hay tareas para este criterio</h4>
             <p className="text-xs text-slate-400 mt-1 max-w-md">
               Añade tareas, apuntes o temas de estudio para este día seleccionando el semestre y las asignaturas de Derecho.
             </p>
@@ -610,9 +604,9 @@ export function AgendaView({ onOpenImageScanner }: AgendaViewProps = {}) {
                 setEditingTask(null);
                 setModalOpen(true);
               }}
-              className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-md"
+              className="mt-4 px-4 py-2 bg-gradient-to-r from-yellow-400 to-amber-400 hover:from-yellow-300 hover:to-amber-300 text-black rounded-xl text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shadow-md shadow-yellow-400/20 active:scale-95"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-black stroke-[3]" />
               <span>Crear primera tarea</span>
             </button>
           </div>

@@ -102,21 +102,23 @@ Reglas:
       try {
         const response = await ai.models.generateContent({
           model,
-          contents: {
-            parts: [
-              {
-                inlineData: {
-                  mimeType: detectedMime || 'image/jpeg',
-                  data: cleanBase64,
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: detectedMime || 'image/jpeg',
+                    data: cleanBase64,
+                  },
                 },
-              },
-              {
-                text: 'Extrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.',
-              },
-            ],
-          },
+                {
+                  text: `${systemPrompt}\n\nExtrae todos los eventos, clases, exámenes o citas visibles en esta foto/horario y devuélvelos en formato JSON estructurado según el esquema.`,
+                },
+              ],
+            },
+          ],
           config: {
-            systemInstruction: systemPrompt,
             temperature: 0.1,
             responseMimeType: 'application/json',
             responseSchema: {
@@ -169,9 +171,16 @@ Reglas:
     });
   } catch (error: any) {
     console.error('Error en netlify function parse-schedule-image:', error);
+    let errMsg = error?.message || 'Error al procesar la imagen del horario con IA';
+    try {
+      const parsedErr = JSON.parse(errMsg);
+      if (parsedErr?.error?.message) {
+        errMsg = parsedErr.error.message;
+      }
+    } catch {}
     return new Response(
       JSON.stringify({
-        error: error?.message || 'Error al procesar la imagen del horario con IA',
+        error: errMsg,
       }),
       {
         status: 500,

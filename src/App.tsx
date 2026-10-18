@@ -190,17 +190,17 @@ function CalendarApp() {
               </div>
             )}
 
-            {/* HUD Container: Responsive with flex-wrap, auto margins, black background, yellow tones and todo correcto icon */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-black border border-yellow-500/40 p-2 sm:p-3 rounded-2xl shadow-xl shadow-black/90 my-auto">
+            {/* HUD Container: Responsive with flex-wrap, auto margins, aesthetic dark styling (not pure black), yellow tones and todo correcto icon */}
+            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-2 sm:p-3 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.12)] my-auto">
               {/* Tab Selector (Calendario vs Agenda) */}
-              <div className="flex items-center gap-1.5 bg-black p-1 rounded-xl border border-yellow-500/30 w-full sm:w-auto flex-1 sm:flex-none my-auto mx-auto sm:mx-0">
+              <div className="flex items-center gap-1.5 bg-neutral-800/80 p-1 rounded-xl border border-yellow-500/30 ring-1 ring-yellow-400/10 w-full sm:w-auto flex-1 sm:flex-none my-auto mx-auto sm:mx-0 backdrop-blur-md shadow-inner">
                 <button
                   type="button"
                   onClick={() => setActiveTab('calendar')}
                   className={`flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer my-auto ${
                     activeTab === 'calendar'
-                      ? 'bg-yellow-400 text-black font-extrabold shadow-md shadow-yellow-400/25'
-                      : 'text-yellow-400/80 hover:text-yellow-300 hover:bg-neutral-900'
+                      ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
+                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-700/60'
                   }`}
                 >
                   <CalendarIcon className={`w-4 h-4 ${activeTab === 'calendar' ? 'text-black' : 'text-yellow-400'}`} />
@@ -211,8 +211,8 @@ function CalendarApp() {
                   onClick={() => setActiveTab('agenda')}
                   className={`flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer my-auto ${
                     activeTab === 'agenda'
-                      ? 'bg-yellow-400 text-black font-extrabold shadow-md shadow-yellow-400/25'
-                      : 'text-yellow-400/80 hover:text-yellow-300 hover:bg-neutral-900'
+                      ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
+                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-700/60'
                   }`}
                 >
                   <BookOpen className={`w-4 h-4 ${activeTab === 'agenda' ? 'text-black' : 'text-yellow-400'}`} />
@@ -221,7 +221,7 @@ function CalendarApp() {
               </div>
 
               {/* Status Badge "Todo correcto" with check icon and yellow/black theme */}
-              <div className="flex items-center justify-center gap-2 h-10 px-3.5 py-2 rounded-xl bg-black border border-yellow-500/40 text-xs font-bold text-yellow-400 w-full sm:w-auto my-auto mx-auto sm:mx-0 shadow-inner shrink-0">
+              <div className="flex items-center justify-center gap-2 h-10 px-3.5 py-2 rounded-xl bg-neutral-800/80 border border-yellow-500/40 text-xs font-bold text-yellow-400 w-full sm:w-auto my-auto mx-auto sm:mx-0 shadow-inner ring-1 ring-yellow-400/10 shrink-0 backdrop-blur-md">
                 <CheckCircle2 className="w-4 h-4 text-yellow-400 shrink-0" />
                 <span>Todo correcto</span>
               </div>
@@ -232,7 +232,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={() => setWidgetModalOpen(true)}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-black hover:bg-neutral-900 text-yellow-400 hover:text-yellow-300 border border-yellow-500/40 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto"
+                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
                   title="Poner Widget en Pantalla de Inicio del móvil"
                 >
                   <Smartphone className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
@@ -246,7 +246,7 @@ function CalendarApp() {
                     setAgendaModalDate(undefined);
                     setTaskModalOpen(true);
                   }}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-black hover:bg-neutral-900 text-yellow-400 hover:text-yellow-300 border border-yellow-500/40 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto"
+                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
                   title="Añadir tarea a la agenda"
                 >
                   <Plus className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
@@ -256,7 +256,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={handleOpenNewEvent}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/25 active:scale-95 whitespace-nowrap my-auto"
+                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-300 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/30 active:scale-95 whitespace-nowrap my-auto"
                   title="Añadir nuevo evento al calendario"
                 >
                   <Plus className="w-3.5 h-3.5 text-black stroke-[3] shrink-0" />
