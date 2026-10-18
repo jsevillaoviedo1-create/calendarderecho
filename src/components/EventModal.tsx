@@ -298,22 +298,22 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
       }}
     >
       <div
-        className="w-full max-w-xl md:max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh] relative animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl md:max-w-2xl bg-gradient-to-b from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl sm:rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_30px_rgba(234,179,8,0.15)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh] relative animate-in zoom-in-95 duration-150 backdrop-blur-2xl"
         role="dialog"
         aria-modal="true"
       >
-        {/* Header - Fixed & Always Visible */}
-        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/90 bg-slate-900/95 flex items-center justify-between shrink-0 z-10">
+        {/* Header with HUD Aesthetic */}
+        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-yellow-500/25 bg-neutral-950/70 flex items-center justify-between shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
             <div
-              className="w-4 h-4 rounded-full shadow-md shrink-0 ring-2 ring-slate-800"
+              className="w-4 h-4 rounded-full shadow-md shrink-0 ring-2 ring-yellow-400/40"
               style={{ backgroundColor: color }}
             />
             <div className="min-w-0">
               <h3 className="text-lg sm:text-xl font-bold text-white truncate">
                 {isEditing ? 'Editar Evento' : 'Nuevo Evento'}
               </h3>
-              <p className="text-xs text-slate-400 hidden sm:block truncate">
+              <p className="text-xs text-yellow-300/80 hidden sm:block truncate">
                 {isEditing
                   ? 'Modifica los detalles y horarios del evento'
                   : 'Añade una clase, examen o actividad a tu calendario'}
@@ -327,7 +327,7 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
             onClick={onClose}
             title="Cerrar ventana (Esc)"
             aria-label="Cerrar"
-            className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 border border-transparent hover:border-slate-700/80 transition-colors cursor-pointer shrink-0 ml-2"
+            className="text-yellow-400/70 hover:text-white p-2 rounded-xl hover:bg-neutral-800 border border-transparent hover:border-yellow-500/30 transition-colors cursor-pointer shrink-0 ml-2"
           >
             <X className="w-5 h-5" />
           </button>
@@ -718,8 +718,8 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
             </div>
           </div>
 
-          {/* Sticky Footer - Always Visible and Clickable */}
-          <div className="px-5 sm:px-6 py-3 sm:py-3.5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-between shrink-0 z-10">
+          {/* Sticky Footer with HUD Aesthetic */}
+          <div className="px-5 sm:px-6 py-3 sm:py-3.5 border-t border-yellow-500/25 bg-neutral-950/70 flex items-center justify-between shrink-0 z-10">
             {isEditing ? (
               confirmDelete ? (
                 <div className="flex items-center gap-2">
@@ -727,14 +727,14 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
                     type="button"
                     onClick={handleDelete}
                     disabled={submitting}
-                    className="px-3 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 rounded-xl transition-all cursor-pointer shadow-sm"
+                    className="px-3.5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-500 rounded-xl transition-all cursor-pointer shadow-sm"
                   >
                     Confirmar Borrar
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmDelete(false)}
-                    className="text-xs text-slate-400 hover:text-white px-2 py-1"
+                    className="text-xs text-yellow-300/80 hover:text-white px-2 py-1 cursor-pointer"
                   >
                     Cancelar
                   </button>
@@ -757,16 +757,16 @@ export function EventModal({ isOpen, event, onClose, onOpenCategoryManager }: Ev
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs sm:text-sm font-semibold text-yellow-300/80 hover:text-white rounded-xl hover:bg-neutral-800 border border-yellow-500/30 transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-white rounded-xl shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                className="px-5 py-2.5 text-xs sm:text-sm font-extrabold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-300 text-black rounded-xl shadow-lg shadow-yellow-400/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
               >
-                <Check className="w-4 h-4" />
+                <Check className="w-4 h-4 text-black stroke-[3]" />
                 <span>{submitting ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Añadir Evento'}</span>
               </button>
             </div>

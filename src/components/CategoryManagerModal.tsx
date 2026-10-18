@@ -110,24 +110,24 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="w-full max-w-xl bg-gradient-to-b from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl sm:rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_30px_rgba(234,179,8,0.15)] p-5 sm:p-6 relative flex flex-col max-h-[90vh] backdrop-blur-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+          className="absolute top-5 right-5 text-yellow-400/70 hover:text-white p-2 rounded-xl hover:bg-neutral-800 border border-transparent hover:border-yellow-500/30 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <Tag className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 flex items-center justify-center text-black shadow-md shadow-yellow-400/30">
+            <Tag className="w-5 h-5 text-black" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">Gestionar Categorías</h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-yellow-300/80">
               Todas las categorías son completamente editables y eliminables.
             </p>
           </div>
@@ -140,9 +140,9 @@ export function CategoryManagerModal({ isOpen, onClose }: CategoryManagerModalPr
         )}
 
         {/* Create new category form */}
-        <form onSubmit={handleCreate} className="p-4 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-3 mb-5">
-          <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-slate-300">
-            <Plus className="w-3.5 h-3.5 text-amber-400" />
+        <form onSubmit={handleCreate} className="p-4 bg-neutral-950/70 rounded-2xl border border-yellow-500/30 space-y-3 mb-5 shadow-inner">
+          <h4 className="text-xs font-bold text-white flex items-center gap-1.5 uppercase tracking-wider text-yellow-300">
+            <Plus className="w-3.5 h-3.5 text-yellow-400" />
             <span>Crear nueva categoría</span>
           </h4>
 

@@ -47,22 +47,6 @@ export function DayPreviewPopup({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Instantly close peek preview when releasing mouse click or lifting finger anywhere!
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleRelease = () => {
-      onClose();
-    };
-    window.addEventListener('mouseup', handleRelease, { capture: true });
-    window.addEventListener('touchend', handleRelease, { capture: true });
-    window.addEventListener('pointerup', handleRelease, { capture: true });
-    return () => {
-      window.removeEventListener('mouseup', handleRelease, { capture: true });
-      window.removeEventListener('touchend', handleRelease, { capture: true });
-      window.removeEventListener('pointerup', handleRelease, { capture: true });
-    };
-  }, [isOpen, onClose]);
-
   // Events for that date
   const dayEvents = useMemo(() => {
     if (!dateStr) return [];
@@ -152,9 +136,9 @@ export function DayPreviewPopup({
           </div>
 
           <div className="flex items-center gap-2 shrink-0 ml-2">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-yellow-300 bg-neutral-800/90 px-2.5 py-1 rounded-xl border border-yellow-500/35 shadow-inner">
-              <Hand className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
-              <span>Suelta para cerrar</span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-yellow-300 bg-neutral-800/90 px-2.5 py-1 rounded-xl border border-yellow-500/35 shadow-inner">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+              <span>Esc o clic fuera</span>
             </span>
             <button
               type="button"
@@ -184,9 +168,13 @@ export function DayPreviewPopup({
                 </strong>
               </span>
             </div>
-            <span className="text-[10px] text-yellow-400/70 sm:hidden shrink-0">
-              Suelta para salir
-            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[10px] text-yellow-400 hover:text-white underline sm:hidden shrink-0"
+            >
+              Cerrar
+            </button>
           </div>
 
           {/* Events list */}

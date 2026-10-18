@@ -194,7 +194,7 @@ export function CalendarView({
       }
     };
 
-    // Desktop: mousedown (hold click 1 second to preview)
+    // Desktop: mousedown (hold click 700ms to preview)
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return; // Only left click
       isMouseDown = true;
@@ -208,38 +208,72 @@ export function CalendarView({
         if (isMouseDown) {
           triggerPreview(dateStr);
         }
-      }, 1000);
+      }, 700);
     };
 
-    // Desktop hover while holding click
+    // Desktop: right-click on any day to instantly open Day Preview Popup
+    const handleContextMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const dateStr = extractDateFromEl(target);
+      if (dateStr) {
+        e.preventDefault();
+        triggerPreview(dateStr);
+      }
+    };
+
+    // Desktop hover over a day: staying over a cell for 800ms triggers preview
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isMouseDown) return;
+      if (previewDate || isPeekingRef.current) return;
+
       const target = e.target as HTMLElement;
       const dateStr = extractDateFromEl(target);
 
-      if (!dateStr || dateStr !== hoveredDate) {
+      // If user is holding mouse button and drags into another day
+      if (isMouseDown) {
+        if (!dateStr || dateStr !== hoveredDate) {
+          if (holdTimer) clearTimeout(holdTimer);
+          hoveredDate = dateStr;
+          if (dateStr) {
+            holdTimer = setTimeout(() => {
+              if (isMouseDown) {
+                triggerPreview(dateStr);
+              }
+            }, 700);
+          }
+        }
+        return;
+      }
+
+      // If cursor moved away from any day cell
+      if (!dateStr) {
+        if (holdTimer) {
+          clearTimeout(holdTimer);
+          holdTimer = null;
+        }
+        hoveredDate = null;
+        return;
+      }
+
+      // Cursor moved onto a new day cell
+      if (dateStr !== hoveredDate) {
         if (holdTimer) clearTimeout(holdTimer);
         hoveredDate = dateStr;
-        if (dateStr) {
-          holdTimer = setTimeout(() => {
-            if (isMouseDown) {
-              triggerPreview(dateStr);
-            }
-          }, 1000);
-        } else {
-          closePreviewIfPeeking();
-        }
+        holdTimer = setTimeout(() => {
+          triggerPreview(dateStr);
+        }, 800);
       }
     };
 
     const handleMouseLeave = () => {
-      if (holdTimer) clearTimeout(holdTimer);
+      // If modal is open, leave it open so user can interact!
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
       hoveredDate = null;
-      isMouseDown = false;
-      closePreviewIfPeeking();
     };
 
-    // Mobile touchstart: hold finger 1 second (1000ms) to preview
+    // Mobile touchstart: hold finger 750ms to preview
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const touch = e.touches[0];
@@ -253,56 +287,50 @@ export function CalendarView({
       if (holdTimer) clearTimeout(holdTimer);
       holdTimer = setTimeout(() => {
         triggerPreview(dateStr);
-      }, 1000);
+      }, 750);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!holdTimer && !isPeekingRef.current) return;
+      if (!holdTimer) return;
       const touch = e.touches[0];
       const diffX = Math.abs(touch.clientX - touchStartX);
       const diffY = Math.abs(touch.clientY - touchStartY);
       if (diffX > 16 || diffY > 16) {
         if (holdTimer) clearTimeout(holdTimer);
         holdTimer = null;
-        closePreviewIfPeeking();
       }
     };
 
-    // GLOBAL RELEASE LISTENERS:
-    // When the user releases the click (mouseup/pointerup) or lifts finger (touchend/touchcancel)
-    // anywhere, the preview pop up immediately disappears!
+    // Release listeners: clear pending hold timers.
     const handleGlobalRelease = () => {
       isMouseDown = false;
       if (holdTimer) {
         clearTimeout(holdTimer);
         holdTimer = null;
       }
-      closePreviewIfPeeking();
     };
 
-    container.addEventListener('mousedown', handleMouseDown);
+    // Listeners on calendar container
+    container.addEventListener('mousedown', handleMouseDown, { capture: true });
+    container.addEventListener('contextmenu', handleContextMenu);
     container.addEventListener('mousemove', handleMouseMove);
     container.addEventListener('mouseleave', handleMouseLeave);
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: true });
 
-    window.addEventListener('mouseup', handleGlobalRelease, { capture: true });
-    window.addEventListener('pointerup', handleGlobalRelease, { capture: true });
-    window.addEventListener('touchend', handleGlobalRelease, { capture: true });
-    window.addEventListener('touchcancel', handleGlobalRelease, { capture: true });
+    window.addEventListener('mouseup', handleGlobalRelease);
+    window.addEventListener('touchend', handleGlobalRelease);
 
     return () => {
       if (holdTimer) clearTimeout(holdTimer);
-      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mousedown', handleMouseDown, { capture: true } as any);
+      container.removeEventListener('contextmenu', handleContextMenu);
       container.removeEventListener('mousemove', handleMouseMove);
       container.removeEventListener('mouseleave', handleMouseLeave);
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
-
-      window.removeEventListener('mouseup', handleGlobalRelease, { capture: true });
-      window.removeEventListener('pointerup', handleGlobalRelease, { capture: true });
-      window.removeEventListener('touchend', handleGlobalRelease, { capture: true });
-      window.removeEventListener('touchcancel', handleGlobalRelease, { capture: true });
+      window.removeEventListener('mouseup', handleGlobalRelease);
+      window.removeEventListener('touchend', handleGlobalRelease);
     };
   }, []);
 
