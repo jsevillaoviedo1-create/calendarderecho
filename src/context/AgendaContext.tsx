@@ -8,7 +8,7 @@ import {
   deleteDoc,
   deleteField,
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './AuthContext';
 import {
   AgendaTaskItem,
@@ -74,7 +74,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
 
   // Firestore real-time listener for authenticated user
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser || currentUser.uid === 'local_user' || !auth.currentUser) {
       // Load from localStorage for guest / offline / local-only
       try {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -116,16 +116,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       },
       (error) => {
-        console.error('Agenda Firestore subscription error:', error);
-        try {
-          const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-          if (saved) {
-            setTasks(JSON.parse(saved));
-          }
-        } catch {
-          // Keep current state
-        }
-        setLoading(false);
+        handleFirestoreError(error, OperationType.GET, tasksPath);
       }
     );
 
@@ -172,7 +163,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
 
-    if (currentUser) {
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser) {
       const taskPath = `users/${currentUser.uid}/agenda_tasks/${taskId}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'agenda_tasks', taskId);
@@ -203,7 +194,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
 
-    if (currentUser) {
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser) {
       const taskPath = `users/${currentUser.uid}/agenda_tasks/${id}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'agenda_tasks', id);
@@ -229,7 +220,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
 
-    if (currentUser) {
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser) {
       const taskPath = `users/${currentUser.uid}/agenda_tasks/${id}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'agenda_tasks', id);

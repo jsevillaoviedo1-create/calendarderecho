@@ -35,8 +35,8 @@ interface NavbarProps {
   onOpenWidget?: () => void;
   onSelectEvent?: (event: CalendarEventItem) => void;
   onNavigateToDate?: (dateStr: string) => void;
-  activeTab?: 'calendar' | 'agenda';
-  onSelectTab?: (tab: 'calendar' | 'agenda') => void;
+  activeTab?: 'calendar' | 'agenda' | 'widget';
+  onSelectTab?: (tab: 'calendar' | 'agenda' | 'widget') => void;
 }
 
 export function Navbar({

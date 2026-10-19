@@ -1,6 +1,6 @@
 import { getMessaging, getToken, onMessage, isSupported, Messaging } from 'firebase/messaging';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from './firebase';
+import { db, auth, handleFirestoreError, OperationType } from './firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -51,7 +51,7 @@ export async function initializeFCM(userId: string): Promise<{ success: boolean;
     }
 
     // Save token and notification enabled status in Firestore
-    if (token) {
+    if (token && userId !== 'local_user' && auth.currentUser) {
       try {
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, {

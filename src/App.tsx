@@ -5,12 +5,13 @@
 
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { CalendarProvider } from './context/CalendarContext';
-import { AgendaProvider } from './context/AgendaContext';
+import { CalendarProvider, useCalendar } from './context/CalendarContext';
+import { AgendaProvider, useAgenda } from './context/AgendaContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { Navbar } from './components/Navbar';
 import { CalendarView } from './components/CalendarView';
 import { AgendaView } from './components/AgendaView';
+import { MobileDayWidget } from './components/MobileDayWidget';
 import { EventModal } from './components/EventModal';
 import { AgendaModal } from './components/AgendaModal';
 import { HomeScreenWidgetModal } from './components/HomeScreenWidgetModal';
@@ -22,6 +23,7 @@ import { ImageScheduleScannerModal } from './components/ImageScheduleScannerModa
 import { AuthModal } from './components/AuthModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { AppLogo } from './components/AppLogo';
+import { syncWidgetData } from './lib/widgetSync';
 import { CalendarEventItem } from './types/calendar';
 import {
   Shield,
@@ -40,9 +42,17 @@ import {
 
 function CalendarApp() {
   const { currentUser, loading, isBiometricEnrolled, isBiometricSupported } = useAuth();
+  const { events } = useCalendar();
+  const { tasks } = useAgenda();
 
-  // Tab state: 'calendar' | 'agenda'
-  const [activeTab, setActiveTab] = useState<'calendar' | 'agenda'>('calendar');
+  // Tab state: 'calendar' | 'agenda' | 'widget'
+  const [activeTab, setActiveTab] = useState<'calendar' | 'agenda' | 'widget'>('calendar');
+
+  // Automatically synchronize Calendar events and Agenda tasks to native shared storage
+  // (Android SharedPreferences & iOS UserDefaults) whenever data changes
+  React.useEffect(() => {
+    syncWidgetData(events, tasks);
+  }, [events, tasks]);
 
   // Modals state
   const [eventModalOpen, setEventModalOpen] = useState(false);
@@ -190,39 +200,52 @@ function CalendarApp() {
               </div>
             )}
 
-            {/* HUD Container: Responsive with flex-wrap, auto margins, aesthetic dark styling (not pure black), yellow tones and todo correcto icon */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-2 sm:p-3 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.12)] my-auto">
-              {/* Tab Selector (Calendario vs Agenda) */}
-              <div className="flex items-center gap-1.5 bg-neutral-800/80 p-1 rounded-xl border border-yellow-500/30 ring-1 ring-yellow-400/10 w-full sm:w-auto flex-1 sm:flex-none my-auto mx-auto sm:mx-0 backdrop-blur-md shadow-inner">
+            {/* HUD Container: Responsive with flex-wrap, minimalist aesthetic dark glass styling, yellow highlights */}
+            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-gradient-to-r from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-2 sm:p-2.5 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.06),0_0_24px_rgba(234,179,8,0.12)] my-auto">
+              {/* Tab Selector (Calendario vs Agenda vs Widget 2x2) */}
+              <div className="flex items-center gap-1 bg-neutral-950/70 p-1 rounded-xl border border-yellow-500/30 ring-1 ring-yellow-400/10 w-full sm:w-auto flex-1 sm:flex-none my-auto mx-auto sm:mx-0 backdrop-blur-md shadow-inner">
                 <button
                   type="button"
                   onClick={() => setActiveTab('calendar')}
-                  className={`flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer my-auto ${
+                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
                     activeTab === 'calendar'
                       ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
-                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-700/60'
+                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
                   }`}
                 >
-                  <CalendarIcon className={`w-4 h-4 ${activeTab === 'calendar' ? 'text-black' : 'text-yellow-400'}`} />
+                  <CalendarIcon className={`w-3.5 h-3.5 ${activeTab === 'calendar' ? 'text-black' : 'text-yellow-400'}`} />
                   <span>Calendario</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('agenda')}
-                  className={`flex-1 sm:flex-initial h-10 px-3.5 sm:px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer my-auto ${
+                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
                     activeTab === 'agenda'
                       ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
-                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-700/60'
+                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
                   }`}
                 >
-                  <BookOpen className={`w-4 h-4 ${activeTab === 'agenda' ? 'text-black' : 'text-yellow-400'}`} />
-                  <span>Agenda (Día a Día)</span>
+                  <BookOpen className={`w-3.5 h-3.5 ${activeTab === 'agenda' ? 'text-black' : 'text-yellow-400'}`} />
+                  <span>Agenda</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('widget')}
+                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
+                    activeTab === 'widget'
+                      ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
+                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
+                  }`}
+                  title="Ver Widget Interactivo 2x2"
+                >
+                  <Smartphone className={`w-3.5 h-3.5 ${activeTab === 'widget' ? 'text-black' : 'text-yellow-400'}`} />
+                  <span>Widget 2x2</span>
                 </button>
               </div>
 
               {/* Status Badge "Todo correcto" with check icon and yellow/black theme */}
-              <div className="flex items-center justify-center gap-2 h-10 px-3.5 py-2 rounded-xl bg-neutral-800/80 border border-yellow-500/40 text-xs font-bold text-yellow-400 w-full sm:w-auto my-auto mx-auto sm:mx-0 shadow-inner ring-1 ring-yellow-400/10 shrink-0 backdrop-blur-md">
-                <CheckCircle2 className="w-4 h-4 text-yellow-400 shrink-0" />
+              <div className="flex items-center justify-center gap-1.5 h-9 px-3 py-1.5 rounded-xl bg-neutral-950/70 border border-yellow-500/35 text-[11px] font-bold text-yellow-300 w-full sm:w-auto my-auto mx-auto sm:mx-0 shadow-inner ring-1 ring-yellow-400/10 shrink-0 backdrop-blur-md">
+                <CheckCircle2 className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
                 <span>Todo correcto</span>
               </div>
 
@@ -232,7 +255,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={() => setWidgetModalOpen(true)}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
+                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-700/90 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
                   title="Poner Widget en Pantalla de Inicio del móvil"
                 >
                   <Smartphone className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
@@ -246,7 +269,7 @@ function CalendarApp() {
                     setAgendaModalDate(undefined);
                     setTaskModalOpen(true);
                   }}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
+                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-700/90 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
                   title="Añadir tarea a la agenda"
                 >
                   <Plus className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
@@ -256,7 +279,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={handleOpenNewEvent}
-                  className="flex-1 sm:flex-none h-10 inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-300 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/30 active:scale-95 whitespace-nowrap my-auto"
+                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-400 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/30 active:scale-95 whitespace-nowrap my-auto"
                   title="Añadir nuevo evento al calendario"
                 >
                   <Plus className="w-3.5 h-3.5 text-black stroke-[3] shrink-0" />
@@ -278,10 +301,26 @@ function CalendarApp() {
                 }}
                 navigateToDate={calendarNavDate}
               />
-            ) : (
+            ) : activeTab === 'agenda' ? (
               <AgendaView
                 onOpenImageScanner={() => setImageScannerOpen(true)}
               />
+            ) : (
+              <div className="max-w-2xl mx-auto py-2">
+                <MobileDayWidget
+                  isOpen={true}
+                  onOpenNewEvent={handleOpenNewEvent}
+                  onOpenNewTask={(dateStr) => {
+                    setAgendaModalDate(dateStr);
+                    setTaskModalOpen(true);
+                  }}
+                  onNavigateToCalendar={(d) => {
+                    setActiveTab('calendar');
+                    setCalendarNavDate(d);
+                  }}
+                  isFloatingModal={false}
+                />
+              </div>
             )}
           </>
         ) : (
@@ -364,6 +403,15 @@ function CalendarApp() {
       <HomeScreenWidgetModal
         isOpen={widgetModalOpen}
         onClose={() => setWidgetModalOpen(false)}
+        onOpenNewEvent={handleOpenNewEvent}
+        onOpenNewTask={(dateStr) => {
+          setAgendaModalDate(dateStr);
+          setTaskModalOpen(true);
+        }}
+        onNavigateToCalendar={(d) => {
+          setActiveTab('calendar');
+          setCalendarNavDate(d);
+        }}
       />
 
       {/* Agenda Task Modal for creating/editing study tasks directly */}

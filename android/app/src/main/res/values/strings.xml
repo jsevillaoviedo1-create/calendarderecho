@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Calendario Derecho</string>
+    <string name="title_activity_main">Calendario Derecho</string>
+    <string name="package_name">com.calderecho.app</string>
+    <string name="custom_url_scheme">com.calderecho.app</string>
+    <string name="widget_name">Tareas del Día (2x2)</string>
+    <string name="widget_description">Muestra las tareas de hoy y próximos días con diseño oscuro y bloques azules.</string>
+</resources>

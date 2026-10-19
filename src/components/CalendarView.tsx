@@ -146,10 +146,12 @@ export function CalendarView({
     if (!container) return;
 
     let holdTimer: any = null;
-    let hoveredDate: string | null = null;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
     let touchStartX = 0;
     let touchStartY = 0;
     let isMouseDown = false;
+    let hoveredDate: string | null = null;
 
     const extractDateFromEl = (target: HTMLElement | null): string | null => {
       if (!target) return null;
@@ -167,6 +169,13 @@ export function CalendarView({
         if (parentDay?.dataset?.date) return parentDay.dataset.date;
       }
 
+      // 3. Check day-grid day frame
+      const dayFrame = target.closest('.fc-daygrid-day-frame') as HTMLElement | null;
+      if (dayFrame) {
+        const parentDay = dayFrame.closest('[data-date]') as HTMLElement | null;
+        if (parentDay?.dataset?.date) return parentDay.dataset.date;
+      }
+
       return null;
     };
 
@@ -178,6 +187,10 @@ export function CalendarView({
           navigator.vibrate([40, 50, 40]);
         } catch {}
       }
+      // Retain isPeekingRef briefly so synthesized click on release doesn't open edit modal
+      setTimeout(() => {
+        isPeekingRef.current = false;
+      }, 500);
     };
 
     const closePreviewIfPeeking = () => {
@@ -185,30 +198,30 @@ export function CalendarView({
         clearTimeout(holdTimer);
         holdTimer = null;
       }
-      if (isPeekingRef.current || previewDate) {
+      if (previewDate) {
         setPreviewDate(null);
-        // Retain isPeekingRef briefly so synthesized click on release doesn't open edit modal
-        setTimeout(() => {
-          isPeekingRef.current = false;
-        }, 300);
       }
     };
 
-    // Desktop: mousedown (hold click 700ms to preview)
+    // Desktop: mousedown (hold click 1 second to preview)
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return; // Only left click
       isMouseDown = true;
+      mouseStartX = e.clientX;
+      mouseStartY = e.clientY;
+
       const target = e.target as HTMLElement;
       const dateStr = extractDateFromEl(target);
       if (!dateStr) return;
 
       hoveredDate = dateStr;
       if (holdTimer) clearTimeout(holdTimer);
+      // 1 second (1000ms) hold as requested by user
       holdTimer = setTimeout(() => {
         if (isMouseDown) {
           triggerPreview(dateStr);
         }
-      }, 700);
+      }, 1000);
     };
 
     // Desktop: right-click on any day to instantly open Day Preview Popup
@@ -221,28 +234,26 @@ export function CalendarView({
       }
     };
 
-    // Desktop hover over a day: staying over a cell for 800ms triggers preview
+    // Desktop mousemove: allow slight jitter (<15px) during mousedown hold so 1s timer is not cancelled
     const handleMouseMove = (e: MouseEvent) => {
-      if (previewDate || isPeekingRef.current) return;
+      if (previewDate) return;
 
-      const target = e.target as HTMLElement;
-      const dateStr = extractDateFromEl(target);
-
-      // If user is holding mouse button and drags into another day
+      // If user is holding mouse button on PC, check if moved past threshold
       if (isMouseDown) {
-        if (!dateStr || dateStr !== hoveredDate) {
-          if (holdTimer) clearTimeout(holdTimer);
-          hoveredDate = dateStr;
-          if (dateStr) {
-            holdTimer = setTimeout(() => {
-              if (isMouseDown) {
-                triggerPreview(dateStr);
-              }
-            }, 700);
+        const diffX = Math.abs(e.clientX - mouseStartX);
+        const diffY = Math.abs(e.clientY - mouseStartY);
+        if (diffX > 16 || diffY > 16) {
+          // Deliberate drag: cancel hold timer
+          if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
           }
         }
         return;
       }
+
+      const target = e.target as HTMLElement;
+      const dateStr = extractDateFromEl(target);
 
       // If cursor moved away from any day cell
       if (!dateStr) {
@@ -260,7 +271,7 @@ export function CalendarView({
         hoveredDate = dateStr;
         holdTimer = setTimeout(() => {
           triggerPreview(dateStr);
-        }, 800);
+        }, 1000);
       }
     };
 
@@ -273,7 +284,7 @@ export function CalendarView({
       hoveredDate = null;
     };
 
-    // Mobile touchstart: hold finger 750ms to preview
+    // Mobile touchstart: hold finger 1 second (1000ms) to preview
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const touch = e.touches[0];
@@ -287,7 +298,7 @@ export function CalendarView({
       if (holdTimer) clearTimeout(holdTimer);
       holdTimer = setTimeout(() => {
         triggerPreview(dateStr);
-      }, 750);
+      }, 1000);
     };
 
     const handleTouchMove = (e: TouchEvent) => {

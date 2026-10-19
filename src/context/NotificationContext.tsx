@@ -8,7 +8,7 @@ import {
   deleteDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './AuthContext';
 import { AppNotification, CalendarEventItem } from '../types/calendar';
 import { initializeFCM, listenForegroundFCM, triggerPushNotification } from '../lib/fcm';
@@ -51,8 +51,13 @@ export function NotificationProvider({
 
   // Firestore real-time listener for user-isolated notifications
   useEffect(() => {
-    if (!currentUser) {
-      setNotifications([]);
+    if (!currentUser || currentUser.uid === 'local_user' || !auth.currentUser) {
+      try {
+        const saved = localStorage.getItem('derecho_local_notifications');
+        setNotifications(saved ? JSON.parse(saved) : []);
+      } catch {
+        setNotifications([]);
+      }
       return;
     }
 
@@ -148,6 +153,14 @@ export function NotificationProvider({
     return res;
   };
 
+  const syncLocalNotifications = (next: AppNotification[]) => {
+    try {
+      localStorage.setItem('derecho_local_notifications', JSON.stringify(next));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const notifyEventChange = async (
     title: string,
     body: string,
@@ -156,7 +169,6 @@ export function NotificationProvider({
   ) => {
     if (!currentUser) return;
     const notifId = 'notif_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
-    const path = `users/${currentUser.uid}/notifications/${notifId}`;
     const nowISO = new Date().toISOString();
 
     const notifDoc: AppNotification = {
@@ -170,6 +182,17 @@ export function NotificationProvider({
       createdAt: nowISO,
     };
 
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
+      setNotifications((prev) => {
+        const next = [notifDoc, ...prev];
+        syncLocalNotifications(next);
+        return next;
+      });
+      await triggerPushNotification(title, { body });
+      return;
+    }
+
+    const path = `users/${currentUser.uid}/notifications/${notifId}`;
     try {
       const docRef = doc(db, 'users', currentUser.uid, 'notifications', notifId);
       await setDoc(docRef, notifDoc);
@@ -182,6 +205,15 @@ export function NotificationProvider({
 
   const markAsRead = async (id: string) => {
     if (!currentUser) return;
+
+    setNotifications((prev) => {
+      const next = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      syncLocalNotifications(next);
+      return next;
+    });
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) return;
+
     const path = `users/${currentUser.uid}/notifications/${id}`;
     try {
       const docRef = doc(db, 'users', currentUser.uid, 'notifications', id);
@@ -193,6 +225,15 @@ export function NotificationProvider({
 
   const markAllAsRead = async () => {
     if (!currentUser || notifications.length === 0) return;
+
+    setNotifications((prev) => {
+      const next = prev.map((n) => ({ ...n, read: true }));
+      syncLocalNotifications(next);
+      return next;
+    });
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) return;
+
     const batch = writeBatch(db);
     notifications.forEach((n) => {
       if (!n.read) {
@@ -209,6 +250,12 @@ export function NotificationProvider({
 
   const clearNotifications = async () => {
     if (!currentUser || notifications.length === 0) return;
+
+    setNotifications([]);
+    syncLocalNotifications([]);
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) return;
+
     const batch = writeBatch(db);
     notifications.slice(0, 400).forEach((n) => {
       const docRef = doc(db, 'users', currentUser.uid, 'notifications', n.id);

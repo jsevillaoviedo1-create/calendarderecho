@@ -278,14 +278,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserPreferences = async (prefs: Partial<UserProfile>) => {
     if (!currentUser) return;
+    const updateData = {
+      ...prefs,
+      updatedAt: new Date().toISOString(),
+    };
+    setUserProfile((prev) => (prev ? { ...prev, ...updateData } : null));
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
+      try {
+        localStorage.setItem('derecho_local_profile', JSON.stringify({ ...userProfile, ...updateData }));
+      } catch (e) {
+        console.error(e);
+      }
+      return;
+    }
+
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
-      const updateData = {
-        ...prefs,
-        updatedAt: new Date().toISOString(),
-      };
       await updateDoc(userDocRef, updateData);
-      setUserProfile((prev) => (prev ? { ...prev, ...updateData } : null));
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `users/${currentUser.uid}`);
     }

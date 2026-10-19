@@ -8,7 +8,7 @@ import {
   deleteDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from './AuthContext';
 import {
   CalendarEventItem,
@@ -55,7 +55,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (currentUser.uid === 'local_user') {
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
       try {
         const saved = localStorage.getItem('derecho_local_events');
         setEvents(saved ? JSON.parse(saved) : []);
@@ -93,8 +93,13 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
   // Firestore real-time listener for user custom categories
   useEffect(() => {
-    if (!currentUser) {
-      setCustomCategories([]);
+    if (!currentUser || currentUser.uid === 'local_user' || !auth.currentUser) {
+      try {
+        const saved = localStorage.getItem('derecho_local_categories');
+        setCustomCategories(saved ? JSON.parse(saved) : []);
+      } catch {
+        setCustomCategories([]);
+      }
       return;
     }
 
@@ -183,7 +188,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     const cleanName = name.trim().slice(0, 50);
     const cleanColor = color.trim().slice(0, 32) || '#6366f1';
 
-    if (currentUser) {
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser) {
       const catPath = `users/${currentUser.uid}/categories/${catId}`;
       const payload: CustomCategoryItem = {
         id: catId,
@@ -201,10 +206,18 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       // Local fallback
-      setCustomCategories((prev) => [
-        ...prev,
-        { id: catId, name: cleanName, color: cleanColor, userId: 'local', createdAt: nowISO },
-      ]);
+      setCustomCategories((prev) => {
+        const next = [
+          ...prev,
+          { id: catId, name: cleanName, color: cleanColor, userId: 'local', createdAt: nowISO },
+        ];
+        try {
+          localStorage.setItem('derecho_local_categories', JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+        return next;
+      });
     }
     return catId;
   };
@@ -225,12 +238,18 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Also update customCategories in state if present
-    setCustomCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, name: trimmedName, color: trimmedColor } : c))
-    );
+    setCustomCategories((prev) => {
+      const next = prev.map((c) => (c.id === id ? { ...c, name: trimmedName, color: trimmedColor } : c));
+      try {
+        localStorage.setItem('derecho_local_categories', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
 
-    // If exists in Firestore, update doc
-    if (currentUser && customCategories.some((c) => c.id === id)) {
+    // If exists in Firestore and authenticated, update doc
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser && customCategories.some((c) => c.id === id)) {
       const catPath = `users/${currentUser.uid}/categories/${id}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
@@ -257,7 +276,15 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Remove from customCategories state
-    setCustomCategories((prev) => prev.filter((c) => c.id !== id));
+    setCustomCategories((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      try {
+        localStorage.setItem('derecho_local_categories', JSON.stringify(next));
+      } catch (e) {
+        console.error(e);
+      }
+      return next;
+    });
 
     // If selectedCategory matches deleted category name, reset
     const target = allCategories.find((c) => c.id === id);
@@ -265,8 +292,8 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
       setSelectedCategory('all');
     }
 
-    // If stored in Firestore, delete doc
-    if (currentUser && customCategories.some((c) => c.id === id)) {
+    // If stored in Firestore and authenticated, delete doc
+    if (currentUser && currentUser.uid !== 'local_user' && auth.currentUser && customCategories.some((c) => c.id === id)) {
       const catPath = `users/${currentUser.uid}/categories/${id}`;
       try {
         const docRef = doc(db, 'users', currentUser.uid, 'categories', id);
@@ -301,7 +328,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (data.color) payload.color = sanitize(data.color, 32);
     if (data.category) payload.category = sanitize(data.category, 50);
 
-    if (currentUser.uid === 'local_user') {
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
       setEvents((prev) => {
         const next = [...prev, payload];
         try {
@@ -340,7 +367,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
     if (updates.color !== undefined) cleanUpdates.color = sanitize(updates.color, 32);
     if (updates.category !== undefined) cleanUpdates.category = sanitize(updates.category, 50);
 
-    if (currentUser.uid === 'local_user') {
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
       setEvents((prev) => {
         const next = prev.map((ev) => (ev.id === id ? { ...ev, ...cleanUpdates } : ev));
         try {
@@ -365,7 +392,7 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   const deleteEvent = async (id: string): Promise<void> => {
     if (!currentUser) throw new Error('No estás autenticado.');
 
-    if (currentUser.uid === 'local_user') {
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
       setEvents((prev) => {
         const next = prev.filter((ev) => ev.id !== id);
         try {
@@ -390,6 +417,19 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
   const importEventsBatch = async (newEvents: CalendarEventItem[]): Promise<number> => {
     if (!currentUser) throw new Error('No estás autenticado.');
     if (newEvents.length === 0) return 0;
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
+      setEvents((prev) => {
+        const next = [...prev, ...newEvents];
+        try {
+          localStorage.setItem('derecho_local_events', JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+        return next;
+      });
+      return newEvents.length;
+    }
 
     let importedCount = 0;
     const chunkSize = 250;
@@ -438,6 +478,17 @@ export function CalendarProvider({ children }: { children: React.ReactNode }) {
 
   const clearAllEvents = async (): Promise<void> => {
     if (!currentUser || events.length === 0) return;
+
+    if (currentUser.uid === 'local_user' || !auth.currentUser) {
+      setEvents([]);
+      try {
+        localStorage.removeItem('derecho_local_events');
+      } catch (e) {
+        console.error(e);
+      }
+      return;
+    }
+
     const batch = writeBatch(db);
     events.slice(0, 450).forEach((ev) => {
       const docRef = doc(db, 'users', currentUser.uid, 'events', ev.id);
