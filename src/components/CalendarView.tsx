@@ -5,17 +5,11 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import { useCalendar } from '../context/CalendarContext';
-import { CalendarEventItem, DEFAULT_CATEGORIES } from '../types/calendar';
+import { CalendarEventItem } from '../types/calendar';
 import { DayPreviewPopup } from './DayPreviewPopup';
 import {
   ChevronLeft,
   ChevronRight,
-  Calendar as CalendarIcon,
-  Clock,
-  Sparkles,
-  MapPin,
-  CheckCircle,
-  Filter,
   Camera,
 } from 'lucide-react';
 
@@ -36,7 +30,7 @@ export function CalendarView({
   onOpenNewTask,
   navigateToDate,
 }: CalendarViewProps) {
-  const { filteredEvents, updateEvent, selectedCategory, setSelectedCategory, allCategories, loading } = useCalendar();
+  const { filteredEvents, updateEvent, loading } = useCalendar();
   const calendarRef = useRef<FullCalendar | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeView, setActiveView] = useState('dayGridMonth');
@@ -345,75 +339,8 @@ export function CalendarView({
     };
   }, []);
 
-  // Stats calculation
-  const stats = useMemo(() => {
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const todayCount = filteredEvents.filter((e) => e.start.startsWith(todayStr)).length;
-    return {
-      total: filteredEvents.length,
-      today: todayCount,
-    };
-  }, [filteredEvents]);
-
   return (
     <div className="flex flex-col gap-4">
-      {/* Category filter strip + quick stats with HUD aesthetic */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-3 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)]">
-        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 scrollbar-none">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
-                : 'bg-neutral-800/80 text-yellow-400/80 border-yellow-500/30 hover:text-white hover:bg-neutral-700/80'
-            }`}
-          >
-            Todas ({filteredEvents.length})
-          </button>
-
-          {allCategories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.name)}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all flex items-center gap-1.5 cursor-pointer border ${
-                selectedCategory === cat.name
-                  ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-black border-yellow-400 font-extrabold shadow-sm'
-                  : 'bg-neutral-800/80 text-slate-300 border-neutral-700 hover:text-white hover:bg-neutral-700/80'
-              }`}
-            >
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: cat.color }}
-              />
-              <span>{cat.name}</span>
-            </button>
-          ))}
-
-          {onOpenCategoryManager && (
-            <button
-              onClick={onOpenCategoryManager}
-              title="Gestionar y crear categorías personalizadas"
-              className="px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1 cursor-pointer bg-neutral-800/80 hover:bg-neutral-700/80 text-yellow-400 hover:text-white border border-yellow-500/30"
-            >
-              <span>+ Categoría</span>
-            </button>
-          )}
-        </div>
-
-        {/* Quick stats badge */}
-        <div className="flex items-center gap-3 shrink-0 text-xs text-slate-300 self-end sm:self-center">
-          <div className="flex items-center gap-1.5 bg-neutral-800/80 px-2.5 py-1 rounded-xl border border-yellow-500/30 shadow-inner">
-            <Clock className="w-3.5 h-3.5 text-yellow-400" />
-            <span>Hoy: <strong className="text-white">{stats.today}</strong></span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-neutral-800/80 px-2.5 py-1 rounded-xl border border-yellow-500/30 shadow-inner">
-            <CalendarIcon className="w-3.5 h-3.5 text-yellow-400" />
-            <span>Total: <strong className="text-white">{stats.total}</strong></span>
-          </div>
-        </div>
-      </div>
-
       {/* Main FullCalendar Card with HUD Aesthetic */}
       <div className="bg-gradient-to-r from-zinc-900/95 via-neutral-900/95 to-zinc-900/95 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 rounded-2xl p-4 sm:p-6 shadow-[0_12px_36px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),0_0_24px_rgba(234,179,8,0.1)] relative overflow-hidden">
         {loading && (

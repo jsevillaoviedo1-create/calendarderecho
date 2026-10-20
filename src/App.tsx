@@ -11,7 +11,6 @@ import { NotificationProvider } from './context/NotificationContext';
 import { Navbar } from './components/Navbar';
 import { CalendarView } from './components/CalendarView';
 import { AgendaView } from './components/AgendaView';
-import { MobileDayWidget } from './components/MobileDayWidget';
 import { EventModal } from './components/EventModal';
 import { AgendaModal } from './components/AgendaModal';
 import { HomeScreenWidgetModal } from './components/HomeScreenWidgetModal';
@@ -38,15 +37,39 @@ import {
   Smartphone,
   Plus,
   CheckCircle2,
+  Filter,
+  ChevronDown,
+  Check,
+  Tag,
 } from 'lucide-react';
 
 function CalendarApp() {
   const { currentUser, loading, isBiometricEnrolled, isBiometricSupported } = useAuth();
-  const { events } = useCalendar();
+  const { events, selectedCategory, setSelectedCategory, allCategories } = useCalendar();
   const { tasks } = useAgenda();
 
-  // Tab state: 'calendar' | 'agenda' | 'widget'
-  const [activeTab, setActiveTab] = useState<'calendar' | 'agenda' | 'widget'>('calendar');
+  // Tab state: 'calendar' | 'agenda'
+  const [activeTab, setActiveTab] = useState<'calendar' | 'agenda'>('calendar');
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const filterRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Close filter dropdown on click outside
+  React.useEffect(() => {
+    if (!filterDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [filterDropdownOpen]);
+
+  const activeCategoryColor = React.useMemo(() => {
+    if (selectedCategory === 'all') return undefined;
+    const cat = allCategories.find((c) => c.name === selectedCategory);
+    return cat?.color || '#eab308';
+  }, [selectedCategory, allCategories]);
 
   // Automatically synchronize Calendar events and Agenda tasks to native shared storage
   // (Android SharedPreferences & iOS UserDefaults) whenever data changes
@@ -200,14 +223,14 @@ function CalendarApp() {
               </div>
             )}
 
-            {/* HUD Container: Responsive with flex-wrap, minimalist aesthetic dark glass styling, yellow highlights */}
-            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-gradient-to-r from-neutral-900/98 via-zinc-900/98 to-neutral-900/98 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 p-2 sm:p-2.5 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.06),0_0_24px_rgba(234,179,8,0.12)] my-auto">
-              {/* Tab Selector (Calendario vs Agenda vs Widget 2x2) */}
-              <div className="flex items-center gap-1 bg-neutral-950/70 p-1 rounded-xl border border-yellow-500/30 ring-1 ring-yellow-400/10 w-full sm:w-auto flex-1 sm:flex-none my-auto mx-auto sm:mx-0 backdrop-blur-md shadow-inner">
+            {/* HUD Container: Minimalist aesthetic dark glass with warm yellow accents */}
+            <div className="w-full flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 mb-6 bg-gradient-to-r from-neutral-900/95 via-zinc-900/95 to-neutral-900/95 backdrop-blur-2xl border border-yellow-500/35 ring-1 ring-yellow-400/15 p-2 sm:p-2.5 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.06),0_0_20px_rgba(234,179,8,0.08)]">
+              {/* Left: Tab Selector (Calendario vs Agenda) */}
+              <div className="flex items-center gap-1 bg-neutral-950/80 p-1 rounded-xl border border-yellow-500/25 ring-1 ring-yellow-400/10 shadow-inner">
                 <button
                   type="button"
                   onClick={() => setActiveTab('calendar')}
-                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
+                  className={`h-8 sm:h-9 px-3 sm:px-4 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'calendar'
                       ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
                       : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
@@ -219,7 +242,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('agenda')}
-                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
+                  className={`h-8 sm:h-9 px-3 sm:px-4 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'agenda'
                       ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
                       : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
@@ -228,48 +251,132 @@ function CalendarApp() {
                   <BookOpen className={`w-3.5 h-3.5 ${activeTab === 'agenda' ? 'text-black' : 'text-yellow-400'}`} />
                   <span>Agenda</span>
                 </button>
+              </div>
+
+              {/* Center: Category Filter Dropdown */}
+              <div className="relative" ref={filterRef}>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('widget')}
-                  className={`flex-1 sm:flex-initial h-9 px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer my-auto ${
-                    activeTab === 'widget'
-                      ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black font-extrabold shadow-md shadow-yellow-400/30'
-                      : 'text-yellow-400/80 hover:text-white hover:bg-neutral-800/60'
+                  onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                  className={`h-8 sm:h-9 inline-flex items-center gap-2 px-3 sm:px-3.5 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 text-xs font-bold border ${
+                    selectedCategory !== 'all'
+                      ? 'bg-yellow-400/15 text-yellow-300 border-yellow-400/60 ring-1 ring-yellow-400/20 shadow-yellow-400/10'
+                      : 'bg-neutral-900/90 hover:bg-neutral-800/90 text-yellow-300/90 hover:text-white border border-yellow-500/30 hover:border-yellow-400/50'
                   }`}
-                  title="Ver Widget Interactivo 2x2"
+                  title="Filtrar eventos por categoría"
                 >
-                  <Smartphone className={`w-3.5 h-3.5 ${activeTab === 'widget' ? 'text-black' : 'text-yellow-400'}`} />
-                  <span>Widget 2x2</span>
-                </button>
-              </div>
-
-              {/* Status Badge "Todo correcto" with check icon and yellow/black theme */}
-              <div className="flex items-center justify-center gap-1.5 h-9 px-3 py-1.5 rounded-xl bg-neutral-950/70 border border-yellow-500/35 text-[11px] font-bold text-yellow-300 w-full sm:w-auto my-auto mx-auto sm:mx-0 shadow-inner ring-1 ring-yellow-400/10 shrink-0 backdrop-blur-md">
-                <CheckCircle2 className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-                <span>Todo correcto</span>
-              </div>
-
-              {/* HUD Action Buttons - Responsive with flex-wrap and auto margins */}
-              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto my-auto mx-auto sm:mx-0 sm:ml-auto">
-                {/* Button specifically to install/put widget onto mobile home screen */}
-                <button
-                  type="button"
-                  onClick={() => setWidgetModalOpen(true)}
-                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-700/90 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
-                  title="Poner Widget en Pantalla de Inicio del móvil"
-                >
-                  <Smartphone className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-                  <span className="inline sm:hidden">Widget en Inicio</span>
-                  <span className="hidden sm:inline">Poner Widget en Inicio</span>
+                  <Filter className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
+                  <span className="flex items-center gap-1.5 max-w-[130px] sm:max-w-[170px] truncate">
+                    {selectedCategory !== 'all' && (
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0 ring-1 ring-black"
+                        style={{ backgroundColor: activeCategoryColor }}
+                      />
+                    )}
+                    <span className="truncate">
+                      {selectedCategory === 'all' ? 'Todas las categorías' : selectedCategory}
+                    </span>
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-yellow-400/80 transition-transform duration-200 shrink-0 ${
+                      filterDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
 
+                {/* Dropdown Menu */}
+                {filterDropdownOpen && (
+                  <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-64 rounded-2xl bg-neutral-950/98 backdrop-blur-2xl border border-yellow-500/40 ring-1 ring-yellow-400/20 shadow-[0_16px_40px_rgba(0,0,0,0.85),0_0_24px_rgba(234,179,8,0.15)] p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-neutral-800/90 mb-1">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-yellow-400/90">
+                        Filtrar por categoría
+                      </span>
+                      {selectedCategory !== 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCategory('all');
+                            setFilterDropdownOpen(false);
+                          }}
+                          className="text-[10px] text-yellow-400 hover:text-white font-bold cursor-pointer transition-colors"
+                        >
+                          Mostrar todas
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="max-h-56 overflow-y-auto space-y-0.5 scrollbar-thin scrollbar-thumb-yellow-500/30">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory('all');
+                          setFilterDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                          selectedCategory === 'all'
+                            ? 'bg-yellow-400/15 text-yellow-300 border border-yellow-500/30'
+                            : 'text-slate-300 hover:text-white hover:bg-neutral-800/80'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/80 border border-yellow-400/50" />
+                          <span>Todas las categorías</span>
+                        </span>
+                        {selectedCategory === 'all' && <Check className="w-3.5 h-3.5 text-yellow-400 shrink-0" />}
+                      </button>
+
+                      {allCategories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCategory(cat.name);
+                            setFilterDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                            selectedCategory === cat.name
+                              ? 'bg-yellow-400/15 text-yellow-300 border border-yellow-500/30'
+                              : 'text-slate-300 hover:text-white hover:bg-neutral-800/80'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2 truncate">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0 ring-1 ring-white/10"
+                              style={{ backgroundColor: cat.color }}
+                            />
+                            <span className="truncate">{cat.name}</span>
+                          </span>
+                          {selectedCategory === cat.name && <Check className="w-3.5 h-3.5 text-yellow-400 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="border-t border-neutral-800/90 mt-1.5 pt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterDropdownOpen(false);
+                          setCategoryModalOpen(true);
+                        }}
+                        className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold text-yellow-400 hover:text-yellow-300 hover:bg-neutral-900 border border-yellow-500/25 transition-colors cursor-pointer"
+                      >
+                        <Tag className="w-3.5 h-3.5" />
+                        <span>Gestionar categorías</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right: Quick Action Buttons */}
+              <div className="flex items-center gap-2 ml-auto sm:ml-0">
                 <button
                   type="button"
                   onClick={() => {
                     setAgendaModalDate(undefined);
                     setTaskModalOpen(true);
                   }}
-                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-700/90 text-yellow-300 hover:text-white border border-yellow-500/35 hover:border-yellow-400/60 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap my-auto backdrop-blur-md"
+                  className="h-8 sm:h-9 inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800/90 text-yellow-300 hover:text-white border border-yellow-500/30 hover:border-yellow-400/50 font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap"
                   title="Añadir tarea a la agenda"
                 >
                   <Plus className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
@@ -279,7 +386,7 @@ function CalendarApp() {
                 <button
                   type="button"
                   onClick={handleOpenNewEvent}
-                  className="flex-1 sm:flex-none h-9 inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-400 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/30 active:scale-95 whitespace-nowrap my-auto"
+                  className="h-8 sm:h-9 inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 rounded-xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-400 text-black font-extrabold text-xs transition-all cursor-pointer shadow-md shadow-yellow-400/30 active:scale-95 whitespace-nowrap"
                   title="Añadir nuevo evento al calendario"
                 >
                   <Plus className="w-3.5 h-3.5 text-black stroke-[3] shrink-0" />
@@ -301,26 +408,10 @@ function CalendarApp() {
                 }}
                 navigateToDate={calendarNavDate}
               />
-            ) : activeTab === 'agenda' ? (
+            ) : (
               <AgendaView
                 onOpenImageScanner={() => setImageScannerOpen(true)}
               />
-            ) : (
-              <div className="max-w-2xl mx-auto py-2">
-                <MobileDayWidget
-                  isOpen={true}
-                  onOpenNewEvent={handleOpenNewEvent}
-                  onOpenNewTask={(dateStr) => {
-                    setAgendaModalDate(dateStr);
-                    setTaskModalOpen(true);
-                  }}
-                  onNavigateToCalendar={(d) => {
-                    setActiveTab('calendar');
-                    setCalendarNavDate(d);
-                  }}
-                  isFloatingModal={false}
-                />
-              </div>
             )}
           </>
         ) : (
